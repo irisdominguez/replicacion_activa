@@ -1,0 +1,11 @@
+{
+  "name": "Router",
+  "version": "0.0.1",
+  "description": "Trabajo de clase Sistemas Distribuidos",
+  "author": "Iris Dominguez",
+  "main": "",
+  "private": true,
+  "dependencies": {
+    "zeromq": "^5.0.0"
+  }
+}
