@@ -8,7 +8,9 @@ catch(err) {
 var clientSocket = zmq.socket("router");
 var handlerSocket = zmq.socket("router");
 
-handlerSocket.identity = "routerClientHandler";
+
+//Router por el que se habla con los handlers
+handlerSocket.identity = "routerHandler";
 handlerSocket.bind("tcp://127.0.0.1:49153",
 function(err) {
     if (err) throw err;
@@ -19,7 +21,9 @@ function(err) {
 	});
 }); // Handler Socket
 
-clientSocket.identity = "routerClientHandler";
+
+//Router por el que se habla con los clients
+clientSocket.identity = "routerClient";
 clientSocket.bind("tcp://127.0.0.1:49152", 
 function(err) {
     if (err) throw err;
