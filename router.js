@@ -1,4 +1,10 @@
-var zmq = require("zeromq");
+try {
+    var zmq = require("zeromq");
+}
+catch(err) {
+    var zmq = require('zmq');
+}
+
 var clientSocket = zmq.socket("router");
 var handlerSocket = zmq.socket("router");
 
