@@ -45,18 +45,21 @@ replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 	if (err) {
 		console.log(err);
 	}
-	else {
-		console.log('Listening on 49252...');
-	}
 });
 
 
 //Evento de recibir un mensaje del cliente: enviar por el dealer al router
 replier.on('message', function(message) {
-	console.log('Received request: [', message.toString(), ']');
+	var sourceMessage = message.toString();
+	console.log('Received request: [', sourceMessage, ']');
 	
-	dealer.send(message);
-	//~ replier.send('calma que estoy en ello');
+	var packet = {
+		message: sourceMessage,
+		source: id,
+		target: '2',
+		type: 'client_request'
+	}
+	dealer.send(JSON.stringify(packet));
 });
 
 // Al recibir una notifiación de trabajo completado, informar al cliente

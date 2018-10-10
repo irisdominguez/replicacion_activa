@@ -28,6 +28,8 @@ function sendRequest() {
 	var t = requester.send(message);
 }
 
+// Bucle de trabajo, el cliente envía una petición inicial y luego repite
+// cada vez que llega un mensaje de trabajo completado
 requester.on('message', function(request) {
 	sendRequest();
 });

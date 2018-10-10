@@ -29,10 +29,14 @@ clientSocket.identity = 'routerClient';
 clientSocket.bind(CONFIG.IP_ROUTER1_CLIENT, 
 function(err) {
     if (err) throw err;
-    clientSocket.on('message', function(sender, msg) { 
-		console.log(sender);
-		console.log(msg);
-		console.log('received');
-		handlerSocket.send(['1', sender, msg]);
+    clientSocket.on('message', function(sender, packetRaw) {
+		var packetString = packetRaw.toString();
+		console.log('Received from client: ' + packetString);
+		var packet = JSON.parse(packetString);
+		handlerSocket.send([
+			packet.target, 
+			'router', 
+			JSON.stringify(packetString)
+		]);
 	});
 }); // Client Socket
