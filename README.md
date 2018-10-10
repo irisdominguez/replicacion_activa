@@ -3,7 +3,8 @@ Ejercicio de replicación activa con NodeJS
 
 # Modo de uso
 Run Clientes
-  node cliente.js ID
+  node cliente.js
+  node rr.js ID
   ID >= 1
   
 Run Router1

@@ -10,10 +10,16 @@ requester.connect('tcp://127.0.0.1:49252');
 
 
 var count = 0;
-setInterval(function() {
-	count++;
+
+function sendRequest() {
 	msg = "package " + count;
-	console.log("send package");
+	count++;
+	console.log("Sending request " + count);
 	var t = requester.send(msg);
-	console.log(t);
-}, 1000);
+}
+
+requester.on('message', function(request) {
+	sendRequest();
+});
+
+sendRequest();

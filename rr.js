@@ -26,7 +26,7 @@ var dealer = zmq.socket("dealer");
 
 if( process.argv.length < 3) {
 	console.log("Parametros incorrectos");
-	console.log("Modo de ejecucion: node client.js IDCLIENTE (>=1)");
+	console.log("Modo de ejecucion: node rr.js IDCLIENTE (>=1)");
 	process.exit(1);
 }
 
@@ -55,23 +55,18 @@ replier.bind('tcp://127.0.0.1:49252', function(err){
 
 
 //Evento de recibir un mensaje del cliente: enviar por el dealer al router
-replier.on('message', function(request) {
-	console.log('Received request: [', request.toString(), ']');
+replier.on('message', function(message) {
+	console.log('Received request: [', message.toString(), ']');
 	
-	dealer.send(request);
-	replier.send('calma que estoy en ello');
+	dealer.send(message);
+	//~ replier.send('calma que estoy en ello');
 });
 
-
-/*
-setInterval(function() {
-	count++;
-	msg = "package " + count;
-	console.log("send package");
-	var t = dealer.send(msg);
-	console.log(t);
-}, 1000);
-* */
+// Al recibir una notifiación de trabajo completado, informar al cliente
+dealer.on('message', function (message) {
+	console.log('Worked message: ' + message);
+	replier.send(message);
+});
 
 
 
