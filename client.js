@@ -4,9 +4,19 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
+
+var CONFIG = require('./constants.js');
+
+if( process.argv.length < 3) {
+	console.log("Parametros incorrectos");
+	console.log("Modo de ejecucion: node client.js IDCLIENTE (>=1)");
+	process.exit(1);
+}
+
+var id = process.argv[2];
  
 var requester = zmq.socket('req');
-requester.connect('tcp://127.0.0.1:49252');
+requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
 
 
 var count = 0;

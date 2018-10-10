@@ -4,7 +4,7 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
-
+var CONFIG = require('./constants.js');
 
 /* El cliente se conecta mediante:
  * 		-http server 
@@ -17,9 +17,6 @@ catch(err) {
  * poder cambiar los clientes de tipo req-rep por un html server es mejor separarlo
  * 
  * */
- 
- 
-
  
 
 var dealer = zmq.socket("dealer");
@@ -37,14 +34,14 @@ var id = process.argv[2];
 
 console.log("connecting...");
 dealer.identity = id;
-dealer.connect("tcp://127.0.0.1:49152"); //Primer router
+dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
 
 
 
 
 //Conexión con el cliente
 var replier = zmq.socket('rep');
-replier.bind('tcp://127.0.0.1:49252', function(err){
+replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 	if (err) {
 		console.log(err);
 	}

@@ -4,6 +4,7 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
+var CONFIG = require('./constants.js');
 
 var routerLadoClients = zmq.socket("dealer");
 
@@ -16,7 +17,7 @@ if( process.argv.length < 3) {
 var id = process.argv[2];
 
 routerLadoClients.identity = id;
-routerLadoClients.connect("tcp://127.0.0.1:49153");
+routerLadoClients.connect(CONFIG.IP_ROUTER1_HANDLER);
 
 routerLadoClients.on("message", function(id, msg) { 
 	console.log(id + ", " + msg);
