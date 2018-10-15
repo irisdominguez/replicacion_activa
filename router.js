@@ -15,11 +15,15 @@ handlerSocket.identity = 'routerHandler';
 handlerSocket.bind(CONFIG.IP_ROUTER1_HANDLER,
 function(err) {
     if (err) throw err;
-    handlerSocket.on('message', function(sender, msg) { 
-		console.log(sender);
-		console.log(msg);
-		console.log('Handler has worked');
-		clientSocket.send(['client1', sender, msg]);
+    handlerSocket.on('message', function(sender, packetRaw) {
+		var packetString = packetRaw.toString();
+		console.log('Received from handler [' + sender + ']: ' + packetString);
+		var packet = JSON.parse(packetString);
+		clientSocket.send([
+			packet.target, 
+			'router', 
+			JSON.stringify(packet)
+		]);
 	});
 }); // Handler Socket
 
@@ -36,7 +40,7 @@ function(err) {
 		handlerSocket.send([
 			packet.target, 
 			'router', 
-			JSON.stringify(packetString)
+			JSON.stringify(packet)
 		]);
 	});
 }); // Client Socket

@@ -52,7 +52,7 @@ replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 function sendMessage() {
 	var packet = {
 		message: currentMessage,
-		source: id,
+		source: 'client' + id,
 		target: 'handler' + currentHandler,
 		type: 'client_request'
 	}
@@ -76,11 +76,14 @@ replier.on('message', function(message) {
 });
 
 // Al recibir una notifiación de trabajo completado, informar al cliente
-dealer.on('message', function (message) {
+dealer.on('message', function (sender, packetRaw) {
 	clearTimeout(timeoutTimer);
 	timeoutTimer = null;
-	console.log('Worked message: ' + message);
-	replier.send(message);
+	
+	var packetString = packetRaw.toString();
+	console.log('Worked from handler: ' + packetString);
+	var packet = JSON.parse(packetString);
+	replier.send(packet.message);
 });
 
 
