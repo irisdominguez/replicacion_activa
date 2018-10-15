@@ -33,10 +33,12 @@ var id = process.argv[2];
 
 
 console.log('connecting...');
-dealer.identity = id;
+dealer.identity = 'client' + id;
 dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
 
-
+var currentHandler = 1;
+var timeoutTimer = null;
+var currentMessage = '';
 
 
 //Conexión con el cliente
@@ -47,23 +49,36 @@ replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 	}
 });
 
-
-//Evento de recibir un mensaje del cliente: enviar por el dealer al router
-replier.on('message', function(message) {
-	var sourceMessage = message.toString();
-	console.log('Received request: [', sourceMessage, ']');
-	
+function sendMessage() {
 	var packet = {
-		message: sourceMessage,
+		message: currentMessage,
 		source: id,
-		target: '2',
+		target: 'handler' + currentHandler,
 		type: 'client_request'
 	}
 	dealer.send(JSON.stringify(packet));
+	console.log('Sent message to handler ' + packet.target);
+	
+	timeoutTimer = setTimeout(function(){
+		currentHandler++;
+		if (currentHandler > CONFIG.NUM_HANDLERS) currentHandler = 1;
+		sendMessage();
+	}, 1000);
+}
+
+
+//Evento de recibir un mensaje del cliente: enviar por el dealer al router
+replier.on('message', function(message) {
+	currentMessage = message.toString();
+	console.log('Received request: [', currentMessage, ']');
+	
+	sendMessage();
 });
 
 // Al recibir una notifiación de trabajo completado, informar al cliente
 dealer.on('message', function (message) {
+	clearTimeout(timeoutTimer);
+	timeoutTimer = null;
 	console.log('Worked message: ' + message);
 	replier.send(message);
 });

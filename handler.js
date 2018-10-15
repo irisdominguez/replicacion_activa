@@ -16,7 +16,7 @@ if( process.argv.length < 3) {
 
 var id = process.argv[2];
 
-routerLadoClients.identity = id;
+routerLadoClients.identity = 'handler' + id;
 routerLadoClients.connect(CONFIG.IP_ROUTER1_HANDLER);
 
 routerLadoClients.on('message', function(id, msg) { 

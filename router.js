@@ -19,7 +19,7 @@ function(err) {
 		console.log(sender);
 		console.log(msg);
 		console.log('Handler has worked');
-		clientSocket.send(['1', sender, msg]);
+		clientSocket.send(['client1', sender, msg]);
 	});
 }); // Handler Socket
 
