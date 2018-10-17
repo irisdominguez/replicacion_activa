@@ -16,6 +16,9 @@ if( process.argv.length < 3) {
 	process.exit(1);
 }
 
+var packets = {};
+var lastServedReq = -1;
+
 var id = process.argv[2];
 
 routerLadoClients.identity = 'handler' + id;
@@ -39,8 +42,6 @@ routerLadoClients.on('message', function(sender, packetRaw) {
 		producer: packet.source,
 		type: 'handler_request'
 	}
-	socketLadoWorkers.send(JSON.stringify(newPacket));
-	
 	socketTotalOrder.send(JSON.stringify(newPacket));
 });
 
@@ -59,4 +60,20 @@ socketTotalOrder.on('message', function(sender, packetRaw) {
 	console.log('Total order received: ' + packetString);
 	var order = packet.seq;
 	console.log('Total order for [' + packet.id + ']: ' + order);
+	
+	packets[packet.seq] = packetString;
+	
+	if (packet.source == 'handler' + id) {
+		if (packet.seq == lastServedReq + 1) {
+			socketLadoWorkers.send(JSON.stringify(packet));
+			lastServedReq += 1;
+		}
+		else {
+			while(packet.seq > lastServedReq + 1) {
+				var packetToSend = packets[lastServedReq + 1];
+				socketLadoWorkers.send(JSON.stringify(packetToSend));
+				lastServedReq += 1;
+			}
+		}
+	}
 });
