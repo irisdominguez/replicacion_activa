@@ -22,10 +22,13 @@ requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
 var count = 0;
 
 function sendRequest() {
-	message = '|package ' + count + '|';
+	var packet = {
+		id: 'client' + id + '.' + count,
+		message: '|package ' + count + '|'
+	} 
 	count++;
 	console.log('Sending request ' + count);
-	var t = requester.send(message);
+	var t = requester.send(JSON.stringify(packet));
 }
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite

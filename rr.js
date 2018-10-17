@@ -50,14 +50,16 @@ replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 });
 
 function sendMessage() {
+	var packetFromClient = JSON.parse(currentMessage);
 	var packet = {
-		message: currentMessage,
+		id: packetFromClient.id,
+		message: packetFromClient.message,
 		source: 'client' + id,
 		target: 'handler' + currentHandler,
 		type: 'client_request'
 	}
 	dealer.send(JSON.stringify(packet));
-	console.log('Sent message to handler ' + packet.target);
+	console.log('Sent message [' + packetFromClient.id + '] to handler ' + packet.target);
 	
 	timeoutTimer = setTimeout(function(){
 		currentHandler++;
@@ -68,9 +70,10 @@ function sendMessage() {
 
 
 //Evento de recibir un mensaje del cliente: enviar por el dealer al router
-replier.on('message', function(message) {
-	currentMessage = message.toString();
-	console.log('Received request: [', currentMessage, ']');
+replier.on('message', function(packetRaw) {
+	packetString = packetRaw.toString();
+	currentMessage = packetString;
+	console.log('Received request: [', packetString, ']');
 	
 	sendMessage();
 });

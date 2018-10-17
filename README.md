@@ -13,3 +13,11 @@ Run Router1
 Run Handler
 	node handler.js IDHANDLER
 	IDHANDLER >= 1
+
+Run TotalOrder
+	node totalorder.js
+	
+Run Worker
+	node fo.js IDWORKER
+	node worker.js IDWORKER
+	IDWORKER >= 1
