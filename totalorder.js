@@ -64,7 +64,7 @@ function(err) {
            
            handlerSocket.send([                                               //old code but now inside the new if
                 packet.target, 
-			    'totalorder', //totalorder[packet.id][0], //sequence number      /*NEW*/
+			    'totalorder',
 			    JSON.stringify(packet)
            ]);
            

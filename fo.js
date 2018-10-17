@@ -17,11 +17,9 @@ if( process.argv.length < 3) {
 var id = process.argv[2];
 
 dealer.identity = 'worker' + id;
-dealer.connect(CONFIG.IP_TO_WORKER); //Primer router
+dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Primer router
 
 var timeoutTimer = null;
-var waitingPackets = {};                           // NEW (key=sequence number, value=corresponding packet
-var expected_seq_n = 1;                         // NEW
 
 //Conexión con el worker
 var socketWorker = zmq.socket('req');
@@ -49,17 +47,5 @@ dealer.on('message', function (sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('Worked from handler: ' + packetString);
 	var packet = JSON.parse(packetString);
-    if (packet.seq == expected_seq_n) {                      // NEW  Enviar en función del número de secuencia
-	    socketWorker.send(packetString);                      // old code but inside the new if
-        expected_seq_n += 1;                                              // NEW
-        while (expected_seq_n in waitingPackets) {   // NEW
-            socketWorker.send(waitingPackets[expected_seq_n].toString()); // NEW
-            delete waitingPackets[expected_seq_n];    // NEW remove from waitingPackets
-            expected_seq_n += 1;                                          // NEW
-        }
-    }
-    else if (packet.seq > expected_seq_n) { // NEW  Store message
-        waitingPackets[packet.seq] = packet; 
-    }
-    // Si el número de secuencia que llega es menor al esperado, se descarta el paquete ¿?
+	socketWorker.send(packetString);
 });

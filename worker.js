@@ -28,17 +28,7 @@ socket.on('message', function(packetRaw) {
 		source: 'worker' + id,
 		target: packet.source,
 		producer: packet.producer,
-		type: 'worker_reply',
-        seq: packet.seq                                                   // NEW
+		type: 'worker_reply'
 	}
 	socket.send(JSON.stringify(newPacket));
 });
-/* 
- * Haciendolo así creo que no es consistente
- * Según lo veo es fo.js que comprueba si el número de secuencia es el que toca (por así decirlo)
- * Tal y como está ahora, totalorder le pasa a worker y worker a fo
- * Por tanto fo comprueba la secuencia después de que el worker ya ha trabajado
- * De manera que si hay una petición con nºsecuencia 1 que sea x=1 y una con nºsecuencia 2 que sea x=2
- * Si el worker recibe primero la segunda, el resultado final de x será 1 en el worker
- * O esto no importa¿?
- */
