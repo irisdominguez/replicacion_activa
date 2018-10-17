@@ -27,8 +27,11 @@ function sendRequest() {
 		message: '|package ' + count + '|'
 	} 
 	count++;
-	console.log('Sending request ' + count);
-	var t = requester.send(JSON.stringify(packet));
+	if 
+(count<2){
+		console.log('Sending request ' + count);
+		var t = requester.send(JSON.stringify(packet));
+	}
 }
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite

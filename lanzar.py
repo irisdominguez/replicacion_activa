@@ -29,10 +29,9 @@ proc1 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '1'])
 proc2 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '1'])
 proc3 = subprocess.Popen([terminal, '-x', 'node', 'router.js', '1'])
 proc4 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '1'])
+
 proc1.wait()
 proc2.wait()
 proc3.wait()
 proc4.wait()
-
-
 
