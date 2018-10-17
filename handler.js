@@ -17,6 +17,7 @@ if( process.argv.length < 3) {
 }
 
 var packets = {};
+var packets_toBeHandled = {};
 var lastServedReq = -1;
 
 var id = process.argv[2];
@@ -42,6 +43,7 @@ routerLadoClients.on('message', function(sender, packetRaw) {
 		producer: packet.source,
 		type: 'handler_request'
 	}
+	packets_toBeHandled[newPacket.id]=true;
 	socketTotalOrder.send(JSON.stringify(newPacket));
 });
 
@@ -49,9 +51,12 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('Handler received: ' + packetString);
 	var packet = JSON.parse(packetString);
-	var newPacket = packet;
-	newPacket.target = packet.producer;
-	routerLadoClients.send(JSON.stringify(newPacket));
+	if (packet.id in packets_toBeHandled) {
+		delete packets_toBeHandled[packet.id];
+		var newPacket = packet;
+		newPacket.target = packet.producer;
+		routerLadoClients.send(JSON.stringify(newPacket));
+	}
 });
 
 socketTotalOrder.on('message', function(sender, packetRaw) {
