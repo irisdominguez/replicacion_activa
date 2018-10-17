@@ -1,11 +1,17 @@
+//Imports
 try {
     var zmq = require('zeromq');
 }
 catch(err) {
     var zmq = require('zmq');
 }
-
 var CONFIG = require('./constants.js');
+
+
+
+
+
+var dealer = zmq.socket('dealer'); //Conectado con handlers
 
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
@@ -14,13 +20,19 @@ if( process.argv.length < 3) {
 }
 
 var id = process.argv[2];
- 
-var socket = zmq.socket('rep');
-socket.connect(CONFIG.IP_WORKERS + (CONFIG.PORT_WORKERS + id));
 
-socket.on('message', function(packetRaw) {
+dealer.identity = 'worker' + id;
+dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
+
+var timeoutTimer = null;
+
+
+
+
+dealer.on('message', function(sender, packetRaw) {	
+	
 	var packetString = packetRaw.toString();
-	console.log('Worker received: ' + packetString);
+	console.log('W' + id + ': received: ' + packetString);
 	var packet = JSON.parse(packetString);
 	var newPacket = {
 		id: packet.id,
@@ -30,5 +42,7 @@ socket.on('message', function(packetRaw) {
 		producer: packet.producer,
 		type: 'worker_reply'
 	}
-	socket.send(JSON.stringify(newPacket));
+	
+	dealer.send(JSON.stringify(newPacket));
+	
 });

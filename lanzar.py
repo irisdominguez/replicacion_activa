@@ -25,13 +25,19 @@ else:
 
 
 
-proc1 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '1'])
-proc2 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '1'])
-proc3 = subprocess.Popen([terminal, '-x', 'node', 'router.js', '1'])
-proc4 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '1'])
+proc1 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '1'])
+proc2 = subprocess.Popen([terminal, '-x', 'node', 'router.js', '1'])
+proc3 = subprocess.Popen([terminal, '-x', 'node', 'router2.js', '1'])
+proc4 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '3'])
+proc5 = subprocess.Popen([terminal, '-x', 'node', 'worker.js', '1'])
+proc6 = subprocess.Popen([terminal, '-x', 'node', 'totalorder.js', '1'])
+proc7 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '1'])
 
 proc1.wait()
 proc2.wait()
 proc3.wait()
 proc4.wait()
+proc5.wait()
+proc6.wait()
+proc7.wait()
 
