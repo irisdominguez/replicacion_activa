@@ -75,7 +75,7 @@ for i in range(nHandlers): #Lanza los handlers desde 1 hasta nHandlers (ambos in
 	time.sleep(t)
 	
 for i in range(nWorkers): #Lanza los workers desde 1 hasta nWorkers (ambos incluidos)
-	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
+	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'worker.js', str(i+1)]))
 	time.sleep(t)
 
 procTotalorder = subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js'])
