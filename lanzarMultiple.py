@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # * * *
 #Imports
 # * * *
@@ -57,22 +58,22 @@ listaWorkers = []
 #Lanzar los procesos
 # * * *
 for i in range(nClients): #Lanza los rr de los clientes desde 1 hasta nClients (ambos incluidos)
-	listaRrs.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', i+1]))
+	listaRrs.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
 
 procRouter = subprocess.Popen([terminal, ejecutable, 'node', 'router.js'])
 
 procRouter2 = subprocess.Popen([terminal, ejecutable, 'node', 'router2.js'])
 
 for i in range(nHandlers): #Lanza los handlers desde 1 hasta nHandlers (ambos incluidos)
-	listaHandlers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', i+1]))
+	listaHandlers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
 	
 for i in range(nWorkers): #Lanza los workers desde 1 hasta nWorkers (ambos incluidos)
-	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', i+1]))
+	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
 
 procTotalorder = subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js'])
 
 for i in range(nClients): #Lanza los clientes desde 1 hasta nClients (ambos incluidos)
-	listaClients.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', i+1]))
+	listaClients.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', str(i+1)]))
 	
 	
 	
