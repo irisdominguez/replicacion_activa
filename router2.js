@@ -22,14 +22,8 @@ function(err) {
 		var packet = JSON.parse(packetString);
 		
 		if (packet.target == 'workers') {
-			var newPacket = {
-				id: packet.id,
-				message: packet.message,
-				source: packet.source,
-				target: packet.target,
-				type: 'totalorder_request',
-				producer: packet.producer
-            }
+			var newPacket = packet;
+			newPacket.type = 'totalorder_request';
 			for (var i = 1; i < CONFIG.NUM_REPLICAS; i++) {
 				workerSocket.send([
 					'worker' + i, 
