@@ -11,8 +11,8 @@ var socketLadoWorkers = zmq.socket('dealer');
 var socketTotalOrder = zmq.socket('dealer');
 
 if( process.argv.length < 3) {
-	console.log('Parametros incorrectos');
-	console.log('Modo de ejecucion: node handler.js IDHANDLER (>=1)');
+	console.log('H-' + id + ':Parametros incorrectos');
+	console.log('H-' + id + ':Modo de ejecucion: node handler.js IDHANDLER (>=1)');
 	process.exit(1);
 }
 
@@ -33,7 +33,7 @@ socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
 
 routerLadoClients.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
-	console.log('Handler received: ' + packetString);
+	console.log('H-' + id + ':Handler received: ' + packetString);
 	var packet = JSON.parse(packetString);
 	var newPacket = {
 		id: packet.id,
@@ -49,7 +49,7 @@ routerLadoClients.on('message', function(sender, packetRaw) {
 
 socketLadoWorkers.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
-	console.log('Handler received: ' + packetString);
+	console.log('H-' + id + ':Handler received: ' + packetString);
 	var packet = JSON.parse(packetString);
 	if (packet.id in packets_toBeHandled) {
 		delete packets_toBeHandled[packet.id];
@@ -62,9 +62,9 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 socketTotalOrder.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	var packet = JSON.parse(packetString);
-	console.log('Total order received: ' + packetString);
+	console.log('H-' + id + ':Total order received: ' + packetString);
 	var order = packet.seq;
-	console.log('Total order for [' + packet.id + ']: ' + order);
+	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
 	
 	packets[packet.seq] = packetString;
 	

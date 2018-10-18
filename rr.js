@@ -20,19 +20,20 @@ var CONFIG = require('./constants.js');
  
 
 var dealer = zmq.socket('dealer');
+var id = process.argv[2];
 
 if( process.argv.length < 3) {
-	console.log('Parametros incorrectos');
-	console.log('Modo de ejecucion: node rr.js IDCLIENTE (>=1)');
+	console.log('rr-' + id + ':Parametros incorrectos');
+	console.log('rr-' + id + ':Modo de ejecucion: node rr.js IDCLIENTE (>=1)');
 	process.exit(1);
 }
 
-var id = process.argv[2];
 
 
 
 
-console.log('connecting...');
+
+console.log('rr-' + id + ':connecting...');
 dealer.identity = 'client' + id;
 dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
 
@@ -59,7 +60,7 @@ function sendMessage() {
 		type: 'client_request'
 	}
 	dealer.send(JSON.stringify(packet));
-	console.log('Sent message [' + packetFromClient.id + '] to handler ' + packet.target);
+	console.log('rr-' + id + ':Sent message [' + packetFromClient.id + '] to handler ' + packet.target);
 	
 	timeoutTimer = setTimeout(function(){
 		currentHandler++;
@@ -73,7 +74,7 @@ function sendMessage() {
 replier.on('message', function(packetRaw) {
 	packetString = packetRaw.toString();
 	currentMessage = packetString;
-	console.log('Received request: [', packetString, ']');
+	console.log('rr-' + id + ':Received request: [', packetString, ']');
 	
 	sendMessage();
 });
@@ -84,7 +85,7 @@ dealer.on('message', function (sender, packetRaw) {
 	timeoutTimer = null;
 	
 	var packetString = packetRaw.toString();
-	console.log('Worked from handler: ' + packetString);
+	console.log('rr-' + id + ':Worked from handler: ' + packetString);
 	var packet = JSON.parse(packetString);
 	replier.send(packet.message);
 });

@@ -17,7 +17,7 @@ function(err) {
     if (err) throw err;
     handlerSocket.on('message', function(sender, packetRaw) {
 		var packetString = packetRaw.toString();
-		console.log('Received from handler [' + sender + ']: ' + packetString);
+		console.log('R1:Received from handler [' + sender + ']: ' + packetString);
 		var packet = JSON.parse(packetString);
 		clientSocket.send([
 			packet.target, 
@@ -35,7 +35,7 @@ function(err) {
     if (err) throw err;
     clientSocket.on('message', function(sender, packetRaw) {
 		var packetString = packetRaw.toString();
-		console.log('Received from client: ' + packetString);
+		console.log('R1:Received from client: ' + packetString);
 		var packet = JSON.parse(packetString);
 		handlerSocket.send([
 			packet.target, 

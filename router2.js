@@ -16,7 +16,7 @@ function(err) {
     if (err) throw err;
     handlerSocket.on('message', function(sender, packetRaw) {
 		var packetString = packetRaw.toString();
-		console.log('Received from handler [' + sender + ']: ' + packetString);
+		console.log('R2:Received from handler [' + sender + ']: ' + packetString);
 		var packet = JSON.parse(packetString);
 		
 		if (packet.target == 'workers') {
@@ -47,7 +47,7 @@ function(err) {
     if (err) throw err;
     workerSocket.on('message', function(sender, packetRaw) {
 		var packetString = packetRaw.toString();
-		console.log('Received from worker [' + sender + ']: ' + packetString);
+		console.log('R2:Received from worker [' + sender + ']: ' + packetString);
 		var packet = JSON.parse(packetString);
 
 		handlerSocket.send([                                               //old code but now inside the new if

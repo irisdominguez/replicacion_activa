@@ -7,14 +7,15 @@ catch(err) {
 var CONFIG = require('./constants.js');
 
 var dealer = zmq.socket('dealer');
+var id = process.argv[2];
 
 if( process.argv.length < 3) {
-	console.log('Parametros incorrectos');
-	console.log('Modo de ejecucion: node rr.js IDWORKER (>=1)');
+	console.log('Fo-' + id + ':Parametros incorrectos');
+	console.log('Fo-' + id + ':Modo de ejecucion: node rr.js IDWORKER (>=1)');
 	process.exit(1);
 }
 
-var id = process.argv[2];
+
 
 dealer.identity = 'worker' + id;
 dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Primer router
@@ -32,7 +33,7 @@ socketWorker.bind(CONFIG.IP_WORKERS + (CONFIG.PORT_WORKERS + id), function(err){
 //Evento de recibir un mensaje del worker: enviar por el dealer al router
 socketWorker.on('message', function(packetRaw) {
 	var packetString = packetRaw.toString();
-	console.log('Worker finished: ' + packetString);
+	console.log('Fo-' + id + ':Worker finished: ' + packetString);
 	var packet = JSON.parse(packetString);
 
     message_seq = packet.seq;                               // NEW Comprobar el número de secuencia
@@ -45,7 +46,7 @@ dealer.on('message', function (sender, packetRaw) {
 	clearTimeout(timeoutTimer);
 	timeoutTimer = null;
 	var packetString = packetRaw.toString();
-	console.log('Worked from handler: ' + packetString);
+	console.log('Fo-' + id + ':Worked from handler: ' + packetString);
 	var packet = JSON.parse(packetString);
 	socketWorker.send(packetString);
 });

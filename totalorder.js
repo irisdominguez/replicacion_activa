@@ -19,7 +19,7 @@ function(err) {
     if (err) throw err;
     handlerSocket.on('message', function(sender, packetRaw) {
 		var packetString = packetRaw.toString();
-		console.log('Received from handler [' + sender + ']: ' + packetString);
+		console.log('TO:Received from handler [' + sender + ']: ' + packetString);
 		var packet = JSON.parse(packetString);
 		// Ordenar la peticion
 		order = 0;
