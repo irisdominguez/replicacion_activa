@@ -5,6 +5,7 @@
 import os
 import subprocess
 import sys
+import time 
 
 
 
@@ -47,6 +48,8 @@ listaRrs = []
 listaHandlers = []
 listaWorkers = []
 
+t = 0.5 #Número de segundos que espera entre lanzamientos
+
 
 
 
@@ -59,21 +62,28 @@ listaWorkers = []
 # * * *
 for i in range(nClients): #Lanza los rr de los clientes desde 1 hasta nClients (ambos incluidos)
 	listaRrs.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
+	time.sleep(t)
 
 procRouter = subprocess.Popen([terminal, ejecutable, 'node', 'router.js'])
+time.sleep(t)
 
 procRouter2 = subprocess.Popen([terminal, ejecutable, 'node', 'router2.js'])
+time.sleep(t)
 
 for i in range(nHandlers): #Lanza los handlers desde 1 hasta nHandlers (ambos incluidos)
 	listaHandlers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
+	time.sleep(t)
 	
 for i in range(nWorkers): #Lanza los workers desde 1 hasta nWorkers (ambos incluidos)
 	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
+	time.sleep(t)
 
 procTotalorder = subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js'])
+time.sleep(t)
 
 for i in range(nClients): #Lanza los clientes desde 1 hasta nClients (ambos incluidos)
 	listaClients.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', str(i+1)]))
+	time.sleep(t)
 	
 	
 	
