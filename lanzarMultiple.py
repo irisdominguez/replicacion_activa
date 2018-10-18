@@ -39,18 +39,19 @@ else:
 # * * *
 #Variables del programa
 # * * *
-nClients = 3
-nHandlers = 3
-nWorkers = 3
+nClients = 2
+nHandlers = 2
+nWorkers = 2
 
 listaClients = []
 listaRrs = []
 listaHandlers = []
 listaWorkers = []
 
-t = 0.5 #Número de segundos que espera entre lanzamientos
+t = 0.25 #Número de segundos que espera entre lanzamientos
 
-
+listaProcesos = []
+listaPids = []
 
 
 
@@ -61,59 +62,62 @@ t = 0.5 #Número de segundos que espera entre lanzamientos
 #Lanzar los procesos
 # * * *
 for i in range(nClients): #Lanza los rr de los clientes desde 1 hasta nClients (ambos incluidos)
-	listaRrs.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
+	listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
 	time.sleep(t)
 
-procRouter = subprocess.Popen([terminal, ejecutable, 'node', 'router.js'])
+listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'router.js']))
 time.sleep(t)
 
-procRouter2 = subprocess.Popen([terminal, ejecutable, 'node', 'router2.js'])
+listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'router2.js']))
 time.sleep(t)
 
 for i in range(nHandlers): #Lanza los handlers desde 1 hasta nHandlers (ambos incluidos)
-	listaHandlers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
+	listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
 	time.sleep(t)
 	
 for i in range(nWorkers): #Lanza los workers desde 1 hasta nWorkers (ambos incluidos)
-	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'worker.js', str(i+1)]))
+	listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'worker.js', str(i+1)]))
 	time.sleep(t)
 
-procTotalorder = subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js'])
+listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js']))
 time.sleep(t)
 
 for i in range(nClients): #Lanza los clientes desde 1 hasta nClients (ambos incluidos)
-	listaClients.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', str(i+1)]))
+	listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', str(i+1)]))
 	time.sleep(t)
 	
 	
 	
 	
 	
+# * * *
+#Guardar los pids de los procesos
+# * * *
+for proc in listaProcesos: #Saco los pids de los procesos lanzados
+	listaPids.append(proc.pid)
+'''
+archivoPids = open('pids.lanzados', 'w')
+for pid in listaPids:
+	print(str(pid))
+	archivoPids.write(str(pid) + '\n')
+archivoPids.close()
+'''
+
+
+
 
 	
 # * * *
 #Esperar a los procesos
 # * * *
-for proc in listaRrs: #Mantiene los rr esperando
+for proc in listaProcesos: #Mantiene los procesos esperando
 	proc.wait()
 	
-procRouter.wait()
+	
+	
+	
+	
 
-procRouter2.wait()
-
-for proc in listaHandlers: #Mantiene los handlers esperando
-	proc.wait()
-	
-for proc in listaWorkers: #Mantiene los workers esperando
-	proc.wait()
-	
-procTotalorder.wait()
-	
-for proc in listaClients: #Mantiene los clientes esperando
-	proc.wait()
-	
-	
-	
 	
 	
 	
