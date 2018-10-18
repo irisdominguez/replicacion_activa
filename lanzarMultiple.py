@@ -1,10 +1,17 @@
+# -*- coding: utf-8 -*-
+# * * *
+#Imports
+# * * *
 import os
 import subprocess
 import sys
+import time 
 
-# os.chdir('replicacion_activa')
 
 
+# * * *
+#Selección de terminal
+# * * *
 try:
     result = subprocess.check_output("gnome-terminal -x echo ok", stderr=subprocess.STDOUT, shell=True)
 except:
@@ -18,54 +25,99 @@ except:
             print('Imposible abrir ninguna terminal')
         else:
             terminal = 'lxterminal'
+            ejecutable = '-e'
     else:
         terminal = 'xfce4-terminal'
+        ejecutable = '-x'
+        
 else:
     terminal = 'gnome-terminal'
+    ejecutable = '-x'
 
 
 
-proc11 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '1'])
-proc12 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '2'])
-proc13 = subprocess.Popen([terminal, '-x', 'node', 'rr.js', '3'])
+# * * *
+#Variables del programa
+# * * *
+nClients = 3
+nHandlers = 3
+nWorkers = 3
 
-proc2 = subprocess.Popen([terminal, '-x', 'node', 'router.js', '1'])
+listaClients = []
+listaRrs = []
+listaHandlers = []
+listaWorkers = []
 
-proc3 = subprocess.Popen([terminal, '-x', 'node', 'router2.js', '1'])
+t = 0.5 #Número de segundos que espera entre lanzamientos
 
-proc41 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '1'])
-proc42 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '2'])
-proc43 = subprocess.Popen([terminal, '-x', 'node', 'handler.js', '3'])
 
-proc51 = subprocess.Popen([terminal, '-x', 'node', 'worker.js', '1'])
-proc52 = subprocess.Popen([terminal, '-x', 'node', 'worker.js', '2'])
-proc53 = subprocess.Popen([terminal, '-x', 'node', 'worker.js', '3'])
 
-proc6 = subprocess.Popen([terminal, '-x', 'node', 'totalorder.js', '1'])
 
-proc71 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '1'])
-proc72 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '2'])
-proc73 = subprocess.Popen([terminal, '-x', 'node', 'client.js', '3'])
 
-proc11.wait()
-proc12.wait()
-proc13.wait()
 
-proc2.wait()
 
-proc3.wait()
 
-proc41.wait()
-proc42.wait()
-proc43.wait()
+# * * *
+#Lanzar los procesos
+# * * *
+for i in range(nClients): #Lanza los rr de los clientes desde 1 hasta nClients (ambos incluidos)
+	listaRrs.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
+	time.sleep(t)
 
-proc51.wait()
-proc52.wait()
-proc53.wait()
+procRouter = subprocess.Popen([terminal, ejecutable, 'node', 'router.js'])
+time.sleep(t)
 
-proc6.wait()
+procRouter2 = subprocess.Popen([terminal, ejecutable, 'node', 'router2.js'])
+time.sleep(t)
 
-proc71.wait()
-proc72.wait()
-proc73.wait()
+for i in range(nHandlers): #Lanza los handlers desde 1 hasta nHandlers (ambos incluidos)
+	listaHandlers.append(subprocess.Popen([terminal, ejecutable, 'node', 'handler.js', str(i+1)]))
+	time.sleep(t)
+	
+for i in range(nWorkers): #Lanza los workers desde 1 hasta nWorkers (ambos incluidos)
+	listaWorkers.append(subprocess.Popen([terminal, ejecutable, 'node', 'worker.js', str(i+1)]))
+	time.sleep(t)
 
+procTotalorder = subprocess.Popen([terminal, ejecutable, 'node', 'totalorder.js'])
+time.sleep(t)
+
+for i in range(nClients): #Lanza los clientes desde 1 hasta nClients (ambos incluidos)
+	listaClients.append(subprocess.Popen([terminal, ejecutable, 'node', 'client.js', str(i+1)]))
+	time.sleep(t)
+	
+	
+	
+	
+	
+
+	
+# * * *
+#Esperar a los procesos
+# * * *
+for proc in listaRrs: #Mantiene los rr esperando
+	proc.wait()
+	
+procRouter.wait()
+
+procRouter2.wait()
+
+for proc in listaHandlers: #Mantiene los handlers esperando
+	proc.wait()
+	
+for proc in listaWorkers: #Mantiene los workers esperando
+	proc.wait()
+	
+procTotalorder.wait()
+	
+for proc in listaClients: #Mantiene los clientes esperando
+	proc.wait()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
