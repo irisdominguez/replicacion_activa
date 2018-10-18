@@ -18,7 +18,7 @@ except:
     try:
         result = subprocess.check_output("xfce4-terminal -x echo ok", stderr=subprocess.STDOUT, shell=True)
     except:
-        result = subprocess.check_output("lxterminal -x echo ok", stderr=subprocess.STDOUT, shell=True)
+        result = subprocess.check_output("lxterminal -e echo ok", stderr=subprocess.STDOUT, shell=True)
         try:
             pass
         except:

@@ -14,7 +14,7 @@ if( process.argv.length < 3) {
 	process.exit(1);
 }
 
-
+console.log('C-' + id);
  
 var requester = zmq.socket('req');
 requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
@@ -35,7 +35,8 @@ function sendRequest() {
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite
 // cada vez que llega un mensaje de trabajo completado
 requester.on('message', function(request) {
-	sendRequest();
+	setTimeout(sendRequest, 500);
+	//~ sendRequest();
 });
 
 sendRequest();

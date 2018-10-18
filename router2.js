@@ -9,6 +9,8 @@ var CONFIG = require('./constants.js');
 var handlerSocket = zmq.socket('router');
 var workerSocket = zmq.socket('router');
 
+console.log('R2');
+
 //Router por el que se habla con los handlers
 handlerSocket.identity = 'totalorder';
 handlerSocket.bind(CONFIG.IP_ROUTER2_HANDLER,

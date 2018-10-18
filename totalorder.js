@@ -9,6 +9,8 @@ var CONFIG = require('./constants.js');
 var handlerSocket = zmq.socket('router');
 var workerSocket = zmq.socket('router');
 
+console.log('TO');
+
 var totalorder = {}; // NEW Dictionary (key -> request id;, value -> array[seqn -> sequence number associated to that message, status -> whether it has been delivered])
 var seq = 0;               // NEW
 

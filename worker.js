@@ -17,6 +17,8 @@ if( process.argv.length < 3) {
 	process.exit(1);
 }
 
+console.log('W-' + id);
+
 dealer.identity = 'worker' + id;
 dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
 

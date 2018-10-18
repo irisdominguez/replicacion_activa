@@ -16,8 +16,7 @@ var CONFIG = require('./constants.js');
  * Nota: podría estar el cliente y el RR en la misma clase, pero para 
  * poder cambiar los clientes de tipo req-rep por un html server es mejor separarlo
  * 
- * */
- 
+ * */ 
 
 var dealer = zmq.socket('dealer');
 var id = process.argv[2];
@@ -28,7 +27,7 @@ if( process.argv.length < 3) {
 	process.exit(1);
 }
 
-
+console.log('rr-' + id);
 
 
 

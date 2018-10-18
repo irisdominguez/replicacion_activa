@@ -10,17 +10,19 @@ var routerLadoClients = zmq.socket('dealer');
 var socketLadoWorkers = zmq.socket('dealer');
 var socketTotalOrder = zmq.socket('dealer');
 
+var id = process.argv[2];
+
 if( process.argv.length < 3) {
 	console.log('H-' + id + ':Parametros incorrectos');
 	console.log('H-' + id + ':Modo de ejecucion: node handler.js IDHANDLER (>=1)');
 	process.exit(1);
 }
 
+console.log('H-' + id);
+
 var packets = {};
 var packets_toBeHandled = {};
 var lastServedReq = -1;
-
-var id = process.argv[2];
 
 routerLadoClients.identity = 'handler' + id;
 routerLadoClients.connect(CONFIG.IP_ROUTER1_HANDLER);
