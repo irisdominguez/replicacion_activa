@@ -61,6 +61,9 @@ listaPids = []
 # * * *
 #Lanzar los procesos
 # * * *
+listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'monitor.js']))
+time.sleep(t)
+
 for i in range(nClients): #Lanza los rr de los clientes desde 1 hasta nClients (ambos incluidos)
 	listaProcesos.append(subprocess.Popen([terminal, ejecutable, 'node', 'rr.js', str(i+1)]))
 	time.sleep(t)

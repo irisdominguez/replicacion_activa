@@ -19,18 +19,20 @@ var CONFIG = require('./constants.js');
  * */ 
 
 var dealer = zmq.socket('dealer');
-var id = process.argv[2];
 
 if( process.argv.length < 3) {
-	console.log('rr-' + id + ':Parametros incorrectos');
-	console.log('rr-' + id + ':Modo de ejecucion: node rr.js IDCLIENTE (>=1)');
+	console.log('Parametros incorrectos');
+	console.log('Modo de ejecucion: node rr.js IDCLIENTE (>=1)');
 	process.exit(1);
 }
 
-console.log('rr-' + id);
+var id = process.argv[2];
+var fullid = 'rr' + id;
 
+console.log(fullid + ' launched');
 
-
+var logger = zmq.socket('push');
+logger.connect(CONFIG.IP_LOGGER);
 
 console.log('rr-' + id + ':connecting...');
 dealer.identity = 'client' + id;
@@ -58,6 +60,7 @@ function sendMessage() {
 		target: 'handler' + currentHandler,
 		type: 'client_request'
 	}
+	logger.send([fullid, 'Requested: ' + packet.id + ' to ' + packet.target]);
 	dealer.send(JSON.stringify(packet));
 	console.log('rr-' + id + ':Sent message [' + packetFromClient.id + '] to handler ' + packet.target);
 	

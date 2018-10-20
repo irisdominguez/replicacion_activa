@@ -7,17 +7,21 @@ catch(err) {
 }
 var CONFIG = require('./constants.js');
 
-var id = process.argv[2];
-
 var dealer = zmq.socket('dealer'); //Conectado con handlers
 
 if( process.argv.length < 3) {
-	console.log('W-' + id + ':Parametros incorrectos');
-	console.log('W-' + id + ':Modo de ejecucion: node worker.js IDWORKER (>=1)');
+	console.log('Parametros incorrectos');
+	console.log('Modo de ejecucion: node worker.js IDWORKER (>=1)');
 	process.exit(1);
 }
 
-console.log('W-' + id);
+var id = process.argv[2];
+var fullid = 'worker' + id;
+
+console.log(fullid + ' launched');
+
+var logger = zmq.socket('push');
+logger.connect(CONFIG.IP_LOGGER);
 
 dealer.identity = 'worker' + id;
 dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
@@ -37,6 +41,7 @@ dealer.on('message', function(sender, packetRaw) {
 	
 	while (expectedSeq in packetsToProcess) {
 		console.log('Working on package with seq ' + packet.seq);
+		logger.send([fullid, 'Worked: [' + packet.seq + ']' + packet.id]);
 		var packet = packetsToProcess[expectedSeq];
 		var newPacket = {
 			id: packet.id,
