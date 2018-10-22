@@ -36,14 +36,14 @@ function sendRequest() {
 	count++;
 	console.log('C-' + id + ':Sending request ' + count);
 	var t = requester.send(JSON.stringify(packet));
-	logger.send([fullid, 'Requested: ' + count]);
+	logger.send([fullid, 'client_request', count]);
 }
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite
 // cada vez que llega un mensaje de trabajo completado
 requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
 requester.on('message', function(request) {
-	logger.send([fullid, 'Finished work']);
+	logger.send([fullid, 'client_response', count]);
 	setTimeout(sendRequest, 500);
 });
 

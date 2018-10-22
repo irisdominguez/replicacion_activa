@@ -44,7 +44,7 @@ dealer.on('message', function(sender, packetRaw) {
 	
 	while (expectedSeq in packetsToProcess) {
 		console.log('Working on package with seq ' + packet.seq);
-		logger.send([fullid, 'Worked: [' + packet.seq + ']' + packet.id]);
+		logger.send([fullid, 'worker_processed', '']);
 		var packet = packetsToProcess[expectedSeq];
 		var newPacket = {
 			id: packet.id,
