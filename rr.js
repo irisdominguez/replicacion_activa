@@ -4,22 +4,10 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
+
 var CONFIG = require('./constants.js');
 
-/* El cliente se conecta mediante:
- * 		-http server 
- * 		-request-reply
- * con RR (retransmisión y redirección)
- * 
- * RR se conecta con un router-router entre RR y los handlers
- * 
- * Nota: podría estar el cliente y el RR en la misma clase, pero para 
- * poder cambiar los clientes de tipo req-rep por un html server es mejor separarlo
- * 
- * */ 
-
-var dealer = zmq.socket('dealer');
-
+// Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
 	console.log('Modo de ejecucion: node rr.js IDCLIENTE (>=1)');
@@ -34,17 +22,18 @@ console.log(fullid + ' launched');
 var logger = zmq.socket('push');
 logger.connect(CONFIG.IP_LOGGER);
 
-console.log('rr-' + id + ':connecting...');
-dealer.identity = 'client' + id;
-dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
+// Sockets
+var dealer = zmq.socket('dealer');
+var replier = zmq.socket('rep');
 
+dealer.identity = 'client' + id;
+
+// State variables
 var currentHandler = 1;
 var timeoutTimer = null;
 var currentMessage = '';
 
-
 //Conexión con el cliente
-var replier = zmq.socket('rep');
 replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
 	if (err) {
 		console.log(err);
@@ -71,7 +60,6 @@ function sendMessage() {
 	}, 1000);
 }
 
-
 //Evento de recibir un mensaje del cliente: enviar por el dealer al router
 replier.on('message', function(packetRaw) {
 	packetString = packetRaw.toString();
@@ -82,6 +70,7 @@ replier.on('message', function(packetRaw) {
 });
 
 // Al recibir una notifiación de trabajo completado, informar al cliente
+dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
 dealer.on('message', function (sender, packetRaw) {
 	clearTimeout(timeoutTimer);
 	timeoutTimer = null;

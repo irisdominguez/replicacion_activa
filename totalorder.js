@@ -4,13 +4,16 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
-var CONFIG = require('./constants.js');
 
-var handlerSocket = zmq.socket('router');
-var workerSocket = zmq.socket('router');
+var CONFIG = require('./constants.js');
 
 console.log('TO');
 
+// Sockets
+var handlerSocket = zmq.socket('router');
+var workerSocket = zmq.socket('router');
+
+// State variables
 var totalorder = {}; // NEW Dictionary (key -> request id;, value -> array[seqn -> sequence number associated to that message, status -> whether it has been delivered])
 var seq = 0;               // NEW
 

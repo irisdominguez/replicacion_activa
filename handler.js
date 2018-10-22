@@ -4,12 +4,10 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
+
 var CONFIG = require('./constants.js');
 
-var routerLadoClients = zmq.socket('dealer');
-var socketLadoWorkers = zmq.socket('dealer');
-var socketTotalOrder = zmq.socket('dealer');
-
+// Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
 	console.log('Modo de ejecucion: node handler.js IDHANDLER (>=1)');
@@ -24,19 +22,21 @@ console.log(fullid + ' launched');
 var logger = zmq.socket('push');
 logger.connect(CONFIG.IP_LOGGER);
 
+// Sockets
+var routerLadoClients = zmq.socket('dealer');
+var socketLadoWorkers = zmq.socket('dealer');
+var socketTotalOrder = zmq.socket('dealer');
+
+routerLadoClients.identity = 'handler' + id;
+socketLadoWorkers.identity = 'handler' + id;
+socketTotalOrder.identity = 'handler' + id;
+
+// State variables
 var packets = {};
 var packets_toBeHandled = {};
 var lastServedReq = -1;
 
-routerLadoClients.identity = 'handler' + id;
 routerLadoClients.connect(CONFIG.IP_ROUTER1_HANDLER);
-
-socketLadoWorkers.identity = 'handler' + id;
-socketLadoWorkers.connect(CONFIG.IP_ROUTER2_HANDLER);
-
-socketTotalOrder.identity = 'handler' + id;
-socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
-
 routerLadoClients.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('H-' + id + ':Handler received: ' + packetString);
@@ -54,6 +54,7 @@ routerLadoClients.on('message', function(sender, packetRaw) {
 	socketTotalOrder.send(JSON.stringify(newPacket));
 });
 
+socketLadoWorkers.connect(CONFIG.IP_ROUTER2_HANDLER);
 socketLadoWorkers.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('H-' + id + ':Handler received: ' + packetString);
@@ -67,6 +68,7 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 	}
 });
 
+socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
 socketTotalOrder.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	var packet = JSON.parse(packetString);

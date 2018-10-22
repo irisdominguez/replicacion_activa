@@ -7,6 +7,7 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+// Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
 	console.log('Modo de ejecucion: node client.js IDCLIENTE (>=1)');
@@ -21,9 +22,10 @@ console.log(fullid + ' launched');
 var logger = zmq.socket('push');
 logger.connect(CONFIG.IP_LOGGER);
 
+// Sockets
 var requester = zmq.socket('req');
-requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
 
+// State variables
 var count = 0;
 
 function sendRequest() {
@@ -39,10 +41,10 @@ function sendRequest() {
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite
 // cada vez que llega un mensaje de trabajo completado
+requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
 requester.on('message', function(request) {
 	logger.send([fullid, 'Finished work']);
 	setTimeout(sendRequest, 500);
-	//~ sendRequest();
 });
 
 sendRequest();

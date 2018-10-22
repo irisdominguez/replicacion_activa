@@ -4,15 +4,19 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
-var CONFIG = require('./constants.js');
 
-var handlerSocket = zmq.socket('router');
-var workerSocket = zmq.socket('router');
+var CONFIG = require('./constants.js');
 
 console.log('R2');
 
-//Router por el que se habla con los handlers
+// Sockets
+var handlerSocket = zmq.socket('router');
+var workerSocket = zmq.socket('router');
+
 handlerSocket.identity = 'totalorder';
+workerSocket.identity = 'totalorder';
+
+//Router por el que se habla con los handlers
 handlerSocket.bind(CONFIG.IP_ROUTER2_HANDLER,
 function(err) {
     if (err) throw err;
@@ -37,7 +41,6 @@ function(err) {
 
 
 //Router por el que se habla con los workers
-workerSocket.identity = 'totalorder';
 workerSocket.bind(CONFIG.IP_ROUTER2_WORKER, 
 function(err) {
     if (err) throw err;

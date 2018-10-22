@@ -1,14 +1,13 @@
-//Imports
 try {
     var zmq = require('zeromq');
 }
 catch(err) {
     var zmq = require('zmq');
 }
+
 var CONFIG = require('./constants.js');
 
-var dealer = zmq.socket('dealer'); //Conectado con handlers
-
+// Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
 	console.log('Modo de ejecucion: node worker.js IDWORKER (>=1)');
@@ -23,13 +22,17 @@ console.log(fullid + ' launched');
 var logger = zmq.socket('push');
 logger.connect(CONFIG.IP_LOGGER);
 
-dealer.identity = 'worker' + id;
-dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
+// Sockets
+var dealer = zmq.socket('dealer'); //Conectado con handlers
 
+dealer.identity = 'worker' + id;
+
+// State variables
 var packetsToProcess = {};
 var processedStrings = [];
 var expectedSeq = 0;
 
+dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
 dealer.on('message', function(sender, packetRaw) {	
 	
 	var packetString = packetRaw.toString();
