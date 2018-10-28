@@ -26,6 +26,7 @@ logger.connect(CONFIG.IP_LOGGER);
 var routerLadoClients = zmq.socket('dealer');
 var socketLadoWorkers = zmq.socket('dealer');
 var socketTotalOrder = zmq.socket('dealer');
+var totalorderSubscriber = zmq.socket('sub');
 
 routerLadoClients.identity = 'handler' + id;
 socketLadoWorkers.identity = 'handler' + id;
@@ -71,6 +72,34 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
 socketTotalOrder.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
+	var packet = JSON.parse(packetString);
+	console.log('H-' + id + ':Total order received: ' + packetString);
+	var order = packet.seq;
+	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
+	
+	packets[packet.seq] = packetString;
+	
+	if (packet.source == 'handler' + id) {
+		if (packet.seq == lastServedReq + 1) {
+			socketLadoWorkers.send(JSON.stringify(packet));
+			lastServedReq += 1;
+		}
+		else {
+			while(packet.seq > lastServedReq + 1) {
+				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packetToSend.id]);
+				var packetToSend = packets[lastServedReq + 1];
+				socketLadoWorkers.send(JSON.stringify(packetToSend));
+				lastServedReq += 1;
+			}
+		}
+	}
+});
+
+
+totalorderSubscriber.connect(CONFIG.IP_TOTALORDERPUBLISHER2);
+totalorderSubscriber.subscribe('TO');
+totalorderSubscriber.on('message', function(packetRaw) {
+	var packetString = packetRaw.toString().substr(3);
 	var packet = JSON.parse(packetString);
 	console.log('H-' + id + ':Total order received: ' + packetString);
 	var order = packet.seq;
