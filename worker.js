@@ -24,6 +24,7 @@ logger.connect(CONFIG.IP_LOGGER);
 
 // Sockets
 var dealer = zmq.socket('dealer'); //Conectado con handlers
+var routerSubscriber = zmq.socket('sub');
 
 dealer.identity = 'worker' + id;
 
@@ -32,10 +33,14 @@ var packetsToProcess = {};
 var processedStrings = [];
 var expectedSeq = 0;
 
+
+routerSubscriber.connect(CONFIG.IP_ROUTERPUBLISHER);
+routerSubscriber.subscribe('R2');
 dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
-dealer.on('message', function(sender, packetRaw) {	
+
+routerSubscriber.on('message', function(packetRaw) {	//sender, 
 	
-	var packetString = packetRaw.toString();
+	var packetString = packetRaw.toString().substr(3);
 	console.log('W-' + id + ': received: ' + packetString);
 	var packet = JSON.parse(packetString);
 	packetsToProcess[packet.seq] = packet;
@@ -62,4 +67,8 @@ dealer.on('message', function(sender, packetRaw) {
 	}
 	
 });
+
+
+
+
  

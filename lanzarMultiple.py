@@ -39,9 +39,9 @@ else:
 # * * *
 #Variables del programa
 # * * *
-nClients = 2
-nHandlers = 2
-nWorkers = 2
+nClients = 3
+nHandlers = 3
+nWorkers = 3
 
 listaClients = []
 listaRrs = []

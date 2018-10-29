@@ -96,7 +96,7 @@ socketTotalOrder.on('message', function(sender, packetRaw) {
 });
 
 
-totalorderSubscriber.connect(CONFIG.IP_TOTALORDERPUBLISHER2);
+totalorderSubscriber.connect(CONFIG.IP_TOTALORDERPUBLISHER);
 totalorderSubscriber.subscribe('TO');
 totalorderSubscriber.on('message', function(packetRaw) {
 	var packetString = packetRaw.toString().substr(3);
