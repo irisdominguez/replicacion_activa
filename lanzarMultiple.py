@@ -9,6 +9,19 @@ import time
 
 
 
+
+# * * *
+#Borrar ficheros
+# * * *
+import os, glob
+test = os.getcwd() + '/LOGS/*'
+
+r = glob.glob(test)
+for i in r:
+   os.remove(i)
+
+
+
 # * * *
 #Selección de terminal
 # * * *

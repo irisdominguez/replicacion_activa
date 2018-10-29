@@ -49,6 +49,33 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 	
 	while (expectedSeq in packetsToProcess) {
 		console.log('Working on package with seq ' + packet.seq);
+		
+		
+		
+		//Write in file individual
+		var fs = require('fs');
+		//fs.appendFile("/home/ivan/NodeJS_escritos/log" + id + '.txt', 'W-' + id + ': ' + packetString, function(err) {
+		fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', 'W-' + id + ': ' + packetString, function(err) {
+			if(err) { 
+				return console.log(err);
+			}
+
+			//console.log("The file was saved!");
+		}); 
+		//Write in file grupal
+		var fs = require('fs');
+		//fs.appendFile("/home/ivan/NodeJS_escritos/log.txt", 'W-' + id + ': ' + packetString, function(err) {
+		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packetString, function(err) {
+			if(err) {
+				return console.log(err);
+			}
+
+			//console.log("The file was saved!");
+		}); 
+		
+		
+		
+		
 		logger.send([fullid, 'worker_processed', '']);
 		var packet = packetsToProcess[expectedSeq];
 		var newPacket = {
