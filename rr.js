@@ -34,7 +34,7 @@ var timeoutTimer = null;
 var currentMessage = '';
 
 //Conexión con el cliente
-replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id), function(err){
+replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)), function(err){
 	if (err) {
 		console.log(err);
 	}

@@ -57,7 +57,7 @@ function sendRequest() {
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite
 // cada vez que llega un mensaje de trabajo completado
-requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
+requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)));
 requester.on('message', function(request) {
 	logger.send([fullid, 'client_response', count]);
 	setTimeout(sendRequest, 500);
