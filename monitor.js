@@ -53,6 +53,7 @@ function printState() {
 	console.log('Workers completed jobs = ', state.workerJobs);
 	
 	console.log('\n\n\x1b[33mClose this monitor and all other nodes with Ctrl+C');
+	if (!state.launched) console.log('Launch the system with \'l\'');
 }
 
 puller.bind(CONFIG.IP_LOGGER,
@@ -92,11 +93,42 @@ function(err) {
 	}, 100);
 });
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
+process.stdin.on('keypress', (str, key) => {
+	if (key.ctrl && key.name === 'c') {
+		exec('killall -9 node', (err, stdout, stderr) => {});
+		process.exit();
+	} else if (key.name === 'l') {
+		launch();
+	}
 });
 
-rl.on('close', () => {
-	exec('killall -9 node', (err, stdout, stderr) => {});
-})
+
+function launch() {
+	if (state.launched) return;
+	state.launched = true;
+	
+	exec('node router.js', (err, stdout, stderr) => {if (err) {return;}});
+	exec('node router2.js', (err, stdout, stderr) => {if (err) {return;}});
+	exec('node totalorder.js', (err, stdout, stderr) => {if (err) {return;}});
+
+	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
+		exec('node fo.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+	}
+	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
+		exec('node worker.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+	}
+	
+	for (var i = 0; i < CONFIG.NUM_HANDLERS; i++) {	
+		exec('node handler.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+	}
+	
+	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
+		exec('node rr.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+	}
+	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
+		exec('node client.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+	}
+}
+
