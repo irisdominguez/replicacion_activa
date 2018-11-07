@@ -38,9 +38,9 @@ function sendRequest() {
 	textoMensaje = textoMensaje + ' _ ' + aleatorio;
 	
 	var frutas = ['Albaricoque', 
-	              'Manzanas',
+	              'Mandarina',
 				  'Naranja',
-				  'Peras', 
+				  'Melon', 
 				  'Kiwi'];
 	textoMensaje = frutas[aleatorio % frutas.length]
 	
