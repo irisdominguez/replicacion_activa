@@ -27,15 +27,15 @@ var state = {
 }
 
 function checkAlive() {
-	exec('ps a | grep \'node client\' | wc -l', (err, stdout, stderr) => {
+	exec('ps a | grep \'/bin/sh -c node client.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.clientsAlive = parseInt(stdout) - 2;
 	});
-	exec('ps a | grep \'node handler\' | wc -l', (err, stdout, stderr) => {
+	exec('ps a | grep \'/bin/sh -c node handler.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.handlersAlive = parseInt(stdout) - 2;
 	});
-	exec('ps a | grep \'node worker\' | wc -l', (err, stdout, stderr) => {
+	exec('ps a | grep \'/bin/sh -c node worker.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.workersAlive = parseInt(stdout) - 2;
 	});
@@ -109,26 +109,37 @@ function launch() {
 	if (state.launched) return;
 	state.launched = true;
 	
-	exec('node router.js', (err, stdout, stderr) => {if (err) {return;}});
-	exec('node router2.js', (err, stdout, stderr) => {if (err) {return;}});
-	exec('node totalorder.js', (err, stdout, stderr) => {if (err) {return;}});
-
+	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
+	exec('mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
+	
+	function launchFragment(name) {
+		exec('node ' + name + '.js &>LOGS/execution/' + name + '.log', 
+			(err, stdout, stderr) => {if (err) {return;}});
+	};
+	
+	function launchFragment(name, i) {
+		exec('node ' + name + '.js ' + i + ' &>LOGS/execution/' + name + i + '.log', 
+			(err, stdout, stderr) => {if (err) {return;}});
+	};
+	
+	
+	launchFragment('router');
+	launchFragment('router2');
+	launchFragment('totalorder');
+	
 	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
-		exec('node fo.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
-	}
-	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
-		exec('node worker.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+		launchFragment('worker', i);
 	}
 	
 	for (var i = 0; i < CONFIG.NUM_HANDLERS; i++) {	
-		exec('node handler.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+		launchFragment('handler', i);
 	}
 	
 	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		exec('node rr.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+		launchFragment('rr', i);
 	}
 	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		exec('node client.js ' + i, (err, stdout, stderr) => {if (err) {return;}});
+		launchFragment('client', i);
 	}
 }
 

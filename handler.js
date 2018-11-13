@@ -114,7 +114,7 @@ totalorderSubscriber.on('message', function(packetRaw) {
 		}
 		else {
 			while(packet.seq > lastServedReq + 1) {
-				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packetToSend.id]);
+				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packet.id]);
 				var packetToSend = packets[lastServedReq + 1];
 				socketLadoWorkers.send(JSON.stringify(packetToSend));
 				lastServedReq += 1;
