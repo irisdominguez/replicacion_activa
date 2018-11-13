@@ -29,9 +29,25 @@ var requester = zmq.socket('req');
 var count = 0;
 
 function sendRequest() {
+	var max = 5;
+	var aleatorio = Math.round( Math.random()*max*parseInt(id) );
+	var textoMensaje = ''
+	for(var i=0; i<parseInt(id); i++){
+		textoMensaje = textoMensaje + ' * ';
+	}
+	textoMensaje = textoMensaje + ' _ ' + aleatorio;
+	
+	var frutas = ['Albaricoque', 
+	              'Mandarina',
+				  'Naranja',
+				  'Melon', 
+				  'Kiwi'];
+	textoMensaje = frutas[aleatorio % frutas.length]
+	
 	var packet = {
 		id: 'client' + id + '.' + count,
-		message: '|package ' + count + '|'
+		//message: '¡Hola! Soy el cliente ' + id + ' y este es mi mensaje número ' + count + '. ¿Me lo guardas en el fichero, porfa? ¡Gracias!'
+		message: JSON.stringify({nReps: aleatorio, mensaje: textoMensaje})
 	} 
 	count++;
 	console.log('C-' + id + ':Sending request ' + count);
@@ -41,7 +57,7 @@ function sendRequest() {
 
 // Bucle de trabajo, el cliente envía una petición inicial y luego repite
 // cada vez que llega un mensaje de trabajo completado
-requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + id));
+requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)));
 requester.on('message', function(request) {
 	logger.send([fullid, 'client_response', count]);
 	setTimeout(sendRequest, 500);
