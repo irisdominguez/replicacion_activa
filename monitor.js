@@ -27,17 +27,17 @@ var state = {
 }
 
 function checkAlive() {
-	exec('ps a | grep \'/bin/sh -c node client.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node client.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.clientsAlive = parseInt(stdout) - 2;
+		state.clientsAlive = parseInt(stdout);
 	});
-	exec('ps a | grep \'/bin/sh -c node handler.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node handler.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.handlersAlive = parseInt(stdout) - 2;
+		state.handlersAlive = parseInt(stdout);
 	});
-	exec('ps a | grep \'/bin/sh -c node worker.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node worker.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.workersAlive = parseInt(stdout) - 2;
+		state.workersAlive = parseInt(stdout);
 	});
 }
 
@@ -52,7 +52,7 @@ function printState() {
 	console.log('Client responses = ', state.clientResponses);
 	console.log('Workers completed jobs = ', state.workerJobs);
 	
-	console.log('\n\n\x1b[33mClose this monitor and all other nodes with Ctrl+C');
+	console.log('\n\x1b[33mClose this monitor and all other nodes with Ctrl+C');
 	if (!state.launched) console.log('Launch the system with \'l\'');
 }
 
