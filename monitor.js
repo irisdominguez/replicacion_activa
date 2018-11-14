@@ -29,17 +29,17 @@ var state = {
 }
 
 function checkAlive() {
-	exec('ps a | grep \'/bin/sh -c node client.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node client.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.clientsAlive = parseInt(stdout) - 2;
+		state.clientsAlive = parseInt(stdout);
 	});
-	exec('ps a | grep \'/bin/sh -c node handler.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node handler.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.handlersAlive = parseInt(stdout) - 2;
+		state.handlersAlive = parseInt(stdout);
 	});
-	exec('ps a | grep \'/bin/sh -c node worker.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node worker.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
-		state.workersAlive = parseInt(stdout) - 2;
+		state.workersAlive = parseInt(stdout);
 	});
 }
 
@@ -55,7 +55,7 @@ function printState() {
 	console.log('Workers completed jobs = ', state.workerJobs);
 	console.log('csv prep = ', state.responseTime);
 	
-	console.log('\n\n\x1b[33mClose this monitor and all other nodes with Ctrl+C');
+	console.log('\n\x1b[33mClose this monitor and all other nodes with Ctrl+C or \'q\'');
 	if (!state.launched) console.log('Launch the system with \'l\'');
 }
 
@@ -101,7 +101,8 @@ function(err) {
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 process.stdin.on('keypress', (str, key) => {
-	if (key.ctrl && key.name === 'c') {
+	if (key.name === 'q' || 
+		(key.ctrl && key.name === 'c')) {
 		exec('killall -9 node', (err, stdout, stderr) => {});
 		process.exit();
 	} else if (key.name === 'l') {
@@ -122,7 +123,7 @@ function launch() {
 			(err, stdout, stderr) => {if (err) {return;}});
 	};
 	
-	function launchFragment(name, i) {
+	function launchFragmentWithIndex(name, i) {
 		exec('node ' + name + '.js ' + i + ' &>LOGS/execution/' + name + i + '.log', 
 			(err, stdout, stderr) => {if (err) {return;}});
 	};
@@ -133,18 +134,18 @@ function launch() {
 	launchFragment('totalorder');
 	
 	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
-		launchFragment('worker', i);
+		launchFragmentWithIndex('worker', i);
 	}
 	
 	for (var i = 0; i < CONFIG.NUM_HANDLERS; i++) {	
-		launchFragment('handler', i);
+		launchFragmentWithIndex('handler', i);
 	}
 	
 	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		launchFragment('rr', i);
+		launchFragmentWithIndex('rr', i);
 	}
 	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		launchFragment('client', i);
+		launchFragmentWithIndex('client', i);
 	}
 }
 
