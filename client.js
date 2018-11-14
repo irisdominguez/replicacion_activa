@@ -27,7 +27,7 @@ var requester = zmq.socket('req');
 
 // State variables
 var count = 0;
-
+var tr;
 function sendRequest() {
 	var max = 5;
 	var aleatorio = Math.round( Math.random()*max*parseInt(id) );
@@ -52,6 +52,7 @@ function sendRequest() {
 	count++;
 	console.log('C-' + id + ':Sending request ' + count);
 	var t = requester.send(JSON.stringify(packet));
+	tr = Date.now();
 	logger.send([fullid, 'client_request', count]);
 }
 
@@ -59,7 +60,8 @@ function sendRequest() {
 // cada vez que llega un mensaje de trabajo completado
 requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)));
 requester.on('message', function(request) {
-	logger.send([fullid, 'client_response', count]);
+	tr = Date.now()-tr;
+	logger.send([fullid, 'client_response', count, tr]);
 	setTimeout(sendRequest, 500);
 });
 

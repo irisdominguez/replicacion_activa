@@ -13,6 +13,7 @@ var CONFIG = require('./constants.js');
 
 
 var puller = zmq.socket('pull');
+var nreq = 0;
 
 
 puller.connect(CONFIG.IP_LOGGER); //Router entre handlers y workers
@@ -20,6 +21,7 @@ puller.connect(CONFIG.IP_LOGGER); //Router entre handlers y workers
 var state = {
 	clientRequests: {},
 	clientResponses: {},
+	responseTime: [],
 	workerJobs: {},
 	clientsAlive: 0,
 	workersAlive: 0,
@@ -51,6 +53,7 @@ function printState() {
 	console.log('Client requests = ', state.clientRequests);
 	console.log('Client responses = ', state.clientResponses);
 	console.log('Workers completed jobs = ', state.workerJobs);
+	console.log('csv prep = ', state.responseTime);
 	
 	console.log('\n\n\x1b[33mClose this monitor and all other nodes with Ctrl+C');
 	if (!state.launched) console.log('Launch the system with \'l\'');
@@ -59,7 +62,7 @@ function printState() {
 puller.bind(CONFIG.IP_LOGGER,
 function(err) {
     if (err) throw err;
-    puller.on('message', function(sender, typeRaw, arg) {
+    puller.on('message', function(sender, typeRaw, arg, arg2) {
 		//~ console.log('[' + sender + '] -> ' + packetRaw.toString());
 		var type = typeRaw.toString();
 		if (type == 'client_request') {
@@ -73,6 +76,8 @@ function(err) {
 		if (type == 'client_response') {
 			if (sender in state.clientResponses) {
 				state.clientResponses[sender] += 1;
+				nreq = nreq + 1;
+				state.responseTime[nreq] = '[' + state.clientsAlive.toString() + ', ' + arg2 + ']';
 			}
 			else {
 				state.clientResponses[sender] = 1;
