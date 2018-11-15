@@ -53,7 +53,6 @@ function printState() {
 	console.log('Client requests = ', state.clientRequests);
 	console.log('Client responses = ', state.clientResponses);
 	console.log('Workers completed jobs = ', state.workerJobs);
-	console.log('csv prep = ', state.responseTime);
 	
 	console.log('\n\x1b[33mClose this monitor and all other nodes with Ctrl+C or \'q\'');
 	if (!state.launched) console.log('Launch the system with \'l\'');
@@ -77,7 +76,7 @@ function(err) {
 			if (sender in state.clientResponses) {
 				state.clientResponses[sender] += 1;
 				nreq = nreq + 1;
-				state.responseTime[nreq] = '[' + state.clientsAlive.toString() + ', ' + arg2 + ']';
+				state.responseTime[nreq] = state.clientsAlive.toString() + ', ' + arg2;
 			}
 			else {
 				state.clientResponses[sender] = 1;
@@ -103,6 +102,18 @@ process.stdin.setRawMode(true);
 process.stdin.on('keypress', (str, key) => {
 	if (key.name === 'q' || 
 		(key.ctrl && key.name === 'c')) {
+			
+			//log file
+			exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
+			exec('rm LOGS/measures/renposeTime.csv', (err, stdout, stderr) => {if (err) {return;}});
+			exec('touch LOGS/measures/renposeTime.csv', (err, stdout, stderr) => {if (err) {return;}});
+			var fs = require('fs');
+			for(var i=0; i<nreq; i++){
+				fs.appendFileSync(__dirname + '/LOGS/measures/renposeTime.csv', state.responseTime[i] + '\n',
+				function(err) { if(err) { return console.log(err); }});
+			}
+			
+		
 		exec('killall -9 node', (err, stdout, stderr) => {});
 		process.exit();
 	} else if (key.name === 'l') {
