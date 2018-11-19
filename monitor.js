@@ -110,7 +110,7 @@ process.stdin.on('keypress', (str, key) => {
 			exec('touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
 			var fs = require('fs');
 			for(var i=0; i<nreq; i++){
-				fs.appendFileSync(__dirname + '/LOGS/measures/renposeTime.csv', state.responseTime[i] + '\n',
+				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
 				function(err) { if(err) { return console.log(err); }});
 			}
 			
@@ -123,12 +123,12 @@ process.stdin.on('keypress', (str, key) => {
 });
 
 function launchFragment(name) {
-	exec('node ' + name + '.js &>LOGS/execution/' + name + '.log', 
+	exec('node ' + name + '.js | tee LOGS/execution/' + name + '.log', 
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
 function launchFragmentWithIndex(name, i) {
-	exec('node ' + name + '.js ' + i + ' &>LOGS/execution/' + name + i + '.log', 
+	exec('node ' + name + '.js ' + i + ' | tee LOGS/execution/' + name + i + '.log', 
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
