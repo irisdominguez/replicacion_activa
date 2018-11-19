@@ -25,7 +25,8 @@ var state = {
 	workerJobs: {},
 	clientsAlive: 0,
 	workersAlive: 0,
-	handlersAlive: 0
+	handlersAlive: 0,
+	launchedClients: 0
 }
 
 function checkAlive() {
@@ -121,6 +122,21 @@ process.stdin.on('keypress', (str, key) => {
 	}
 });
 
+function launchFragment(name) {
+	exec('node ' + name + '.js &>LOGS/execution/' + name + '.log', 
+		(err, stdout, stderr) => {if (err) {return;}});
+};
+
+function launchFragmentWithIndex(name, i) {
+	exec('node ' + name + '.js ' + i + ' &>LOGS/execution/' + name + i + '.log', 
+		(err, stdout, stderr) => {if (err) {return;}});
+};
+
+function launchClient() {
+	state.launchedClients += 1;
+	launchFragmentWithIndex('rr', state.launchedClients);
+	launchFragmentWithIndex('client', state.launchedClients);
+}
 
 function launch() {
 	if (state.launched) return;
@@ -129,34 +145,20 @@ function launch() {
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
 	exec('mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 	
-	function launchFragment(name) {
-		exec('node ' + name + '.js &>LOGS/execution/' + name + '.log', 
-			(err, stdout, stderr) => {if (err) {return;}});
-	};
-	
-	function launchFragmentWithIndex(name, i) {
-		exec('node ' + name + '.js ' + i + ' &>LOGS/execution/' + name + i + '.log', 
-			(err, stdout, stderr) => {if (err) {return;}});
-	};
-	
-	
 	launchFragment('router');
 	launchFragment('router2');
 	launchFragment('totalorder');
 	
-	for (var i = 0; i < CONFIG.NUM_REPLICAS; i++) {	
+	for (var i = 1; i <= CONFIG.NUM_REPLICAS; i++) {	
 		launchFragmentWithIndex('worker', i);
 	}
 	
-	for (var i = 0; i < CONFIG.NUM_HANDLERS; i++) {	
+	for (var i = 1; i <= CONFIG.NUM_HANDLERS; i++) {	
 		launchFragmentWithIndex('handler', i);
 	}
 	
-	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		launchFragmentWithIndex('rr', i);
-	}
-	for (var i = 0; i < CONFIG.NUM_CLIENTES; i++) {	
-		launchFragmentWithIndex('client', i);
-	}
+	setInterval(function () {
+		launchClient();
+	}, 5000);
 }
 
