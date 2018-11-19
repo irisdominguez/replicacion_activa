@@ -106,7 +106,7 @@ process.stdin.on('keypress', (str, key) => {
 			//log file
 			exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
 			exec('rm LOGS/measures/renposeTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-			exec('touch LOGS/measures/renposeTime.csv', (err, stdout, stderr) => {if (err) {return;}});
+			exec('touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
 			var fs = require('fs');
 			for(var i=0; i<nreq; i++){
 				fs.appendFileSync(__dirname + '/LOGS/measures/renposeTime.csv', state.responseTime[i] + '\n',
