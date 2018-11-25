@@ -143,6 +143,7 @@ function launch() {
 	state.launched = true;
 	
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
+	exec('rm -rf LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 	exec('mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 	
 	launchFragment('router');
