@@ -4,6 +4,7 @@ try {
 catch(err) {
     var zmq = require('zmq');
 }
+var fs = require('fs');
 
 var CONFIG = require('./constants.js');
 
@@ -30,7 +31,6 @@ dealer.identity = 'worker' + id;
 
 // State variables
 var packetsToProcess = {};
-var processedStrings = [];
 var expectedSeq = 0;
 
 
@@ -53,32 +53,19 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 		
 		
 		//Write in file individual
-		var fs = require('fs');
-		//fs.appendFile("/home/ivan/NodeJS_escritos/log" + id + '.txt', 'W-' + id + ': ' + packetString, function(err) {
-		
 		for(var i=0; i<JSON.parse(packet.message).nReps; i++){
-			//fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', packet.message + '\n', function(err) {
-			fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', JSON.parse(packet.message).mensaje + '\n', function(err) {
-				if(err) { 
-					return console.log(err);
-				}
-
-				//console.log("The file was saved!");
-			}); 
+			fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', JSON.parse(packet.message).mensaje + '\n', 
+				function(err) {
+					if(err) { return console.log(err);}
+				}); 
 		}
 		//Write in file grupal
-		var fs = require('fs');
-		//fs.appendFile("/home/ivan/NodeJS_escritos/log.txt", 'W-' + id + ': ' + packetString, function(err) {
-		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packet.message + '\n', function(err) {
-			if(err) {
-				return console.log(err);
-			}
-
-			//console.log("The file was saved!");
-		}); 
-		
-		
-		
+		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packet.message + '\n', 
+			function(err) {
+				if(err) {
+					return console.log(err);
+				}
+			}); 
 		
 		logger.send([fullid, 'worker_processed', '']);
 		var packet = packetsToProcess[expectedSeq];
@@ -91,7 +78,6 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 			type: 'worker_reply'
 		}
 		
-		processedStrings.push('worked: ' + packet.message);
 		dealer.send(JSON.stringify(newPacket));
 		
 		expectedSeq += 1;

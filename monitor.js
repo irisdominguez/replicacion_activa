@@ -6,6 +6,7 @@ catch(err) {
     var zmq = require('zmq');
 }
 const util = require('util');
+const fs = require('fs');
 const exec = util.promisify(require('child_process').exec);
 const readline = require('readline');
 
@@ -106,15 +107,13 @@ process.stdin.on('keypress', (str, key) => {
 			
 			//log file
 			exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
-			exec('rm LOGS/measures/renposeTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-			exec('touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-			var fs = require('fs');
+			exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
 			for(var i=0; i<nreq; i++){
-				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
+				if (state.responseTime[i])
+					fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
 				function(err) { if(err) { return console.log(err); }});
 			}
 			
-		
 		exec('killall -9 node', (err, stdout, stderr) => {});
 		process.exit();
 	} else if (key.name === 'l') {
@@ -143,8 +142,7 @@ function launch() {
 	state.launched = true;
 	
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
-	exec('rm -rf LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
-	exec('mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
+	exec('rm -rf LOGS/execution; mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 	
 	launchFragment('router');
 	launchFragment('router2');

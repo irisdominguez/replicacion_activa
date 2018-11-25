@@ -36,6 +36,7 @@ var currentMessage = '';
 //Conexión con el cliente
 replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)), function(err){
 	if (err) {
+		console.log("Connecting to " + CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)));
 		console.log(err);
 	}
 });

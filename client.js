@@ -62,7 +62,8 @@ requester.connect(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)));
 requester.on('message', function(request) {
 	tr = Date.now()-tr;
 	logger.send([fullid, 'client_response', count, tr]);
-	setTimeout(sendRequest, 500);
+	//~ setTimeout(sendRequest, 500);
+	sendRequest();
 });
 
 sendRequest();
