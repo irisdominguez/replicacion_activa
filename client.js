@@ -7,6 +7,10 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 // Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
@@ -36,19 +40,19 @@ function sendRequest() {
 		textoMensaje = textoMensaje + ' * ';
 	}
 	textoMensaje = textoMensaje + ' _ ' + aleatorio;
-	
-	var frutas = ['Albaricoque', 
+
+	var frutas = ['Albaricoque',
 	              'Mandarina',
 				  'Naranja',
-				  'Melon', 
+				  'Melon',
 				  'Kiwi'];
 	textoMensaje = frutas[aleatorio % frutas.length]
-	
+
 	var packet = {
 		id: 'client' + id + '.' + count,
 		//message: '¡Hola! Soy el cliente ' + id + ' y este es mi mensaje número ' + count + '. ¿Me lo guardas en el fichero, porfa? ¡Gracias!'
 		message: JSON.stringify({nReps: aleatorio, mensaje: textoMensaje})
-	} 
+	}
 	count++;
 	console.log('C-' + id + ':Sending request ' + count);
 	var t = requester.send(JSON.stringify(packet));

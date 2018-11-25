@@ -7,6 +7,10 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 // Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
@@ -76,9 +80,9 @@ socketTotalOrder.on('message', function(sender, packetRaw) {
 	console.log('H-' + id + ':Total order received: ' + packetString);
 	var order = packet.seq;
 	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
-	
+
 	packets[packet.seq] = packetString;
-	
+
 	if (packet.source == 'handler' + id) {
 		if (packet.seq == lastServedReq + 1) {
 			socketLadoWorkers.send(JSON.stringify(packet));
@@ -104,9 +108,9 @@ totalorderSubscriber.on('message', function(packetRaw) {
 	console.log('H-' + id + ':Total order received: ' + packetString);
 	var order = packet.seq;
 	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
-	
+
 	packets[packet.seq] = packetString;
-	
+
 	if (packet.source == 'handler' + id) {
 		if (packet.seq == lastServedReq + 1) {
 			socketLadoWorkers.send(JSON.stringify(packet));

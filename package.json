@@ -6,6 +6,6 @@
   "main": "",
   "private": true,
   "dependencies": {
-    "zeromq": "^5.0.0"
+    "zeromq": "^5.1.0"
   }
 }

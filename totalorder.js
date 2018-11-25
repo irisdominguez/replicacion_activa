@@ -7,6 +7,10 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 console.log('TO');
 
 // Sockets
@@ -23,12 +27,12 @@ handlerSocket.bind(CONFIG.IP_TOTALORDER,
 	function(err) {
 		if (err) throw err;
 	});
-	
+
 handlerSocketPublisher.bind(CONFIG.IP_TOTALORDERPUBLISHER,
 	function(err) {
 		if (err) throw err;
 	});
-	
+
 handlerSocket.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('TO:Received from handler [' + sender + ']: ' + packetString);
@@ -43,9 +47,9 @@ handlerSocket.on('message', function(sender, packetRaw) {
 		order = seq;
 		seq += 1;
 	}
-	
+
 	packet.seq = order;
-	
+
 	/*for (var i = 1; i < CONFIG.NUM_HANDLERS; i++) {
 		handlerSocket.send([
 			'handler' + i,
@@ -53,6 +57,6 @@ handlerSocket.on('message', function(sender, packetRaw) {
 			JSON.stringify(packet)
 		]);
 	}*/
-	
+
 	handlerSocketPublisher.send('TO ' + JSON.stringify(packet));
 });// Handler Socket

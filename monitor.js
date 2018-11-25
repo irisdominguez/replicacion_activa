@@ -12,6 +12,10 @@ const readline = require('readline');
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 
 var puller = zmq.socket('pull');
 var nreq = 0;
@@ -31,15 +35,15 @@ var state = {
 }
 
 function checkAlive() {
-	exec('ps -o command= a | grep \'^node client.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node --expose-gc client.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.clientsAlive = parseInt(stdout);
 	});
-	exec('ps -o command= a | grep \'^node handler.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node --expose-gc handler.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.handlersAlive = parseInt(stdout);
 	});
-	exec('ps -o command= a | grep \'^node worker.js\' | wc -l', (err, stdout, stderr) => {
+	exec('ps -o command= a | grep \'^node --expose-gc worker.js\' | wc -l', (err, stdout, stderr) => {
 		if (err) {return;}
 		state.workersAlive = parseInt(stdout);
 	});
@@ -55,7 +59,7 @@ function printState() {
 	console.log('Client requests = ', state.clientRequests);
 	console.log('Client responses = ', state.clientResponses);
 	console.log('Workers completed jobs = ', state.workerJobs);
-	
+
 	console.log('\n\x1b[33mClose this monitor and all other nodes with Ctrl+C or \'q\'');
 	if (!state.launched) console.log('Launch the system with \'l\'');
 }
@@ -77,11 +81,14 @@ function(err) {
 		if (type == 'client_response') {
 			if (sender in state.clientResponses) {
 				state.clientResponses[sender] += 1;
-				nreq = nreq + 1;
-				state.responseTime[nreq] = state.clientsAlive.toString() + ', ' + arg2;
 			}
 			else {
 				state.clientResponses[sender] = 1;
+			}
+
+			if (!state.closing) {
+				nreq = nreq + 1;
+				state.responseTime[nreq] = state.launchedClients.toString() + ', ' + arg2;
 			}
 		}
 		if (type == 'worker_processed') {
@@ -102,18 +109,20 @@ function(err) {
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
 process.stdin.on('keypress', (str, key) => {
-	if (key.name === 'q' || 
+	if (key.name === 'q' ||
 		(key.ctrl && key.name === 'c')) {
-			
-			//log file
-			exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
-			exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-			for(var i=0; i<nreq; i++){
-				if (state.responseTime[i])
-					fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
-				function(err) { if(err) { return console.log(err); }});
-			}
-			
+
+		state.closing = true;
+
+		//log file
+		exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
+		exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
+		for(var i=0; i<nreq; i++){
+			if (state.responseTime[i])
+				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
+			function(err) { if(err) { return console.log(err); }});
+		}
+
 		exec('killall -9 node', (err, stdout, stderr) => {});
 		process.exit();
 	} else if (key.name === 'l') {
@@ -122,12 +131,12 @@ process.stdin.on('keypress', (str, key) => {
 });
 
 function launchFragment(name) {
-	exec('node ' + name + '.js | tee LOGS/execution/' + name + '.log', 
+	exec('node --expose-gc ' + name + '.js | tee LOGS/execution/' + name + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
 function launchFragmentWithIndex(name, i) {
-	exec('node ' + name + '.js ' + i + ' | tee LOGS/execution/' + name + i + '.log', 
+	exec('node --expose-gc ' + name + '.js ' + i + ' | tee LOGS/execution/' + name + i + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
@@ -140,22 +149,22 @@ function launchClient() {
 function launch() {
 	if (state.launched) return;
 	state.launched = true;
-	
+
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
 	exec('rm -rf LOGS/execution; mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
-	
+
 	launchFragment('router');
 	launchFragment('router2');
 	launchFragment('totalorder');
-	
-	for (var i = 1; i <= CONFIG.NUM_REPLICAS; i++) {	
+
+	for (var i = 1; i <= CONFIG.NUM_REPLICAS; i++) {
 		launchFragmentWithIndex('worker', i);
 	}
-	
-	for (var i = 1; i <= CONFIG.NUM_HANDLERS; i++) {	
+
+	for (var i = 1; i <= CONFIG.NUM_HANDLERS; i++) {
 		launchFragmentWithIndex('handler', i);
 	}
-	
+
 	setInterval(function () {
 		launchClient();
 	}, 5000);

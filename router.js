@@ -7,6 +7,10 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 console.log('R1');
 
 // Sockets
@@ -25,8 +29,8 @@ function(err) {
 		console.log('R1:Received from handler [' + sender + ']: ' + packetString);
 		var packet = JSON.parse(packetString);
 		clientSocket.send([
-			packet.target, 
-			'router', 
+			packet.target,
+			'router',
 			JSON.stringify(packet)
 		]);
 	});
@@ -34,7 +38,7 @@ function(err) {
 
 
 //Router por el que se habla con los clients
-clientSocket.bind(CONFIG.IP_ROUTER1_CLIENT, 
+clientSocket.bind(CONFIG.IP_ROUTER1_CLIENT,
 function(err) {
     if (err) throw err;
     clientSocket.on('message', function(sender, packetRaw) {
@@ -42,8 +46,8 @@ function(err) {
 		console.log('R1:Received from client: ' + packetString);
 		var packet = JSON.parse(packetString);
 		handlerSocket.send([
-			packet.target, 
-			'router', 
+			packet.target,
+			'router',
 			JSON.stringify(packet)
 		]);
 	});

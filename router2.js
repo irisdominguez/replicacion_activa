@@ -9,6 +9,10 @@ var CONFIG = require('./constants.js');
 
 console.log('R2');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 // Sockets
 var handlerSocket = zmq.socket('router');
 var workerSocket = zmq.socket('router');
@@ -35,18 +39,18 @@ handlerSocket.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
 	console.log('R2:Received from handler [' + sender + ']: ' + packetString);
 	var packet = JSON.parse(packetString);
-	
+
 	if (packet.target == 'workers') {
 		var newPacket = packet;
 		newPacket.type = 'totalorder_request';
 		/*for (var i = 1; i < CONFIG.NUM_REPLICAS; i++) {
 			workerSocket.send([
-				'worker' + i, 
-				'totalorder', 
+				'worker' + i,
+				'totalorder',
 				JSON.stringify(newPacket)
 			]);
 		}*/
-		
+
 
 
 		routerSocketPublisher.send('R2 ' + JSON.stringify(packet));
@@ -55,7 +59,7 @@ handlerSocket.on('message', function(sender, packetRaw) {
 
 
 //Router por el que se habla con los workers
-workerSocket.bind(CONFIG.IP_ROUTER2_WORKER, 
+workerSocket.bind(CONFIG.IP_ROUTER2_WORKER,
 	function(err) {
 		if (err) throw err;
 	}
@@ -67,7 +71,7 @@ workerSocket.on('message', function(sender, packetRaw) {
 	var packet = JSON.parse(packetString);
 
 	handlerSocket.send([                                               //old code but now inside the new if
-		packet.target, 
+		packet.target,
 		'totalorder',
 		JSON.stringify(packet)
 	]);

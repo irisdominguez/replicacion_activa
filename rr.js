@@ -7,6 +7,10 @@ catch(err) {
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 // Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
@@ -53,7 +57,7 @@ function sendMessage() {
 	logger.send([fullid, 'Requested: ' + packet.id + ' to ' + packet.target]);
 	dealer.send(JSON.stringify(packet));
 	console.log('rr-' + id + ':Sent message [' + packetFromClient.id + '] to handler ' + packet.target);
-	
+
 	timeoutTimer = setTimeout(function(){
 		currentHandler++;
 		if (currentHandler > CONFIG.NUM_HANDLERS) currentHandler = 1;
@@ -66,7 +70,7 @@ replier.on('message', function(packetRaw) {
 	packetString = packetRaw.toString();
 	currentMessage = packetString;
 	console.log('rr-' + id + ':Received request: [', packetString, ']');
-	
+
 	sendMessage();
 });
 
@@ -75,7 +79,7 @@ dealer.connect(CONFIG.IP_ROUTER1_CLIENT); //Primer router
 dealer.on('message', function (sender, packetRaw) {
 	clearTimeout(timeoutTimer);
 	timeoutTimer = null;
-	
+
 	var packetString = packetRaw.toString();
 	console.log('rr-' + id + ':Worked from handler: ' + packetString);
 	var packet = JSON.parse(packetString);

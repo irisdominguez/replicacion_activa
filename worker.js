@@ -8,6 +8,10 @@ var fs = require('fs');
 
 var CONFIG = require('./constants.js');
 
+setInterval(function() {
+	global.gc();
+}, 1500);
+
 // Identity
 if( process.argv.length < 3) {
 	console.log('Parametros incorrectos');
@@ -38,35 +42,35 @@ routerSubscriber.connect(CONFIG.IP_ROUTERPUBLISHER);
 routerSubscriber.subscribe('R2');
 dealer.connect(CONFIG.IP_ROUTER2_WORKER); //Router entre handlers y workers
 
-routerSubscriber.on('message', function(packetRaw) {	//sender, 
-	
+routerSubscriber.on('message', function(packetRaw) {	//sender,
+
 	var packetString = packetRaw.toString().substr(3);
 	console.log('W-' + id + ': received: ' + packetString);
 	var packet = JSON.parse(packetString);
 	packetsToProcess[packet.seq] = packet;
-	
+
 	console.log('Received package with seq ' + packet.seq);
-	
+
 	while (expectedSeq in packetsToProcess) {
 		console.log('Working on package with seq ' + packet.seq);
-		
-		
-		
+
+
+
 		//Write in file individual
 		for(var i=0; i<JSON.parse(packet.message).nReps; i++){
-			fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', JSON.parse(packet.message).mensaje + '\n', 
+			fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', JSON.parse(packet.message).mensaje + '\n',
 				function(err) {
 					if(err) { return console.log(err);}
-				}); 
+				});
 		}
 		//Write in file grupal
-		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packet.message + '\n', 
+		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packet.message + '\n',
 			function(err) {
 				if(err) {
 					return console.log(err);
 				}
-			}); 
-		
+			});
+
 		logger.send([fullid, 'worker_processed', '']);
 		var packet = packetsToProcess[expectedSeq];
 		var newPacket = {
@@ -77,15 +81,15 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 			producer: packet.producer,
 			type: 'worker_reply'
 		}
-		
+
 		dealer.send(JSON.stringify(newPacket));
-		
+
 		expectedSeq += 1;
 	}
-	
+
 });
 
 
 
 
- 
+
