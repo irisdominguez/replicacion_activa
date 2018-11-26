@@ -58,15 +58,11 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 
 		//Write in file individual
 		try {
-		for(var i=0; i<JSON.parse(packet.message).nReps; i++){
-			fs.appendFileSync(
-				__dirname + '/LOGS/log' + id + '.txt', 
-				JSON.parse(packet.message).mensaje + '\n');
-		}
-			//Write in file grupal
-			fs.appendFileSync(
-				__dirname + '/LOGS/log.txt',
-				'W-' + id + ': ' + packet.message + '\n');
+			for(var i=0; i<JSON.parse(packet.message).nReps; i++){
+				fs.appendFileSync(
+					__dirname + '/LOGS/log' + id + '.txt', 
+					JSON.parse(packet.message).mensaje + '\n');
+			}
 		} catch (err) {
 			/* Handle the error */
 			throw err;
