@@ -57,20 +57,21 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 
 
 		//Write in file individual
+		try {
 		for(var i=0; i<JSON.parse(packet.message).nReps; i++){
-			fs.appendFile(__dirname + '/LOGS/log' + id + '.txt', JSON.parse(packet.message).mensaje + '\n',
-				function(err) {
-					if(err) { return console.log(err);}
-				});
+			fs.appendFileSync(
+				__dirname + '/LOGS/log' + id + '.txt', 
+				JSON.parse(packet.message).mensaje + '\n');
 		}
-		//Write in file grupal
-		fs.appendFile(__dirname + '/LOGS/log.txt', 'W-' + id + ': ' + packet.message + '\n',
-			function(err) {
-				if(err) {
-					return console.log(err);
-				}
-			});
-
+			//Write in file grupal
+			fs.appendFileSync(
+				__dirname + '/LOGS/log.txt',
+				'W-' + id + ': ' + packet.message + '\n');
+		} catch (err) {
+			/* Handle the error */
+			throw err;
+		}
+		
 		logger.send([fullid, 'worker_processed', '']);
 		var packet = packetsToProcess[expectedSeq];
 		var newPacket = {
