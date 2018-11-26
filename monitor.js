@@ -124,19 +124,21 @@ process.stdin.on('keypress', (str, key) => {
 		}
 
 		exec('killall -9 node', (err, stdout, stderr) => {});
-		process.exit();
+		setTimeout(function() {
+			process.exit();
+		}, 100);
 	} else if (key.name === 'l') {
 		launch();
 	}
 });
 
 function launchFragment(name) {
-	exec('node --expose-gc ' + name + '.js | tee LOGS/execution/' + name + '.log',
+	exec('node --expose-gc ' + name + '.js 2>&1 > LOGS/execution/' + name + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
 function launchFragmentWithIndex(name, i) {
-	exec('node --expose-gc ' + name + '.js ' + i + ' | tee LOGS/execution/' + name + i + '.log',
+	exec('node --expose-gc ' + name + '.js ' + i + ' 2>&1 > LOGS/execution/' + name + i + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
