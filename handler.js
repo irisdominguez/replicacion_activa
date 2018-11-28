@@ -41,6 +41,8 @@ var packets = {};
 var packets_toBeHandled = {};
 var lastServedReq = -1;
 
+socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
+
 routerLadoClients.connect(CONFIG.IP_ROUTER1_HANDLER);
 routerLadoClients.on('message', function(sender, packetRaw) {
 	var packetString = packetRaw.toString();
@@ -73,33 +75,6 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 	}
 });
 
-socketTotalOrder.connect(CONFIG.IP_TOTALORDER);
-socketTotalOrder.on('message', function(sender, packetRaw) {
-	var packetString = packetRaw.toString();
-	var packet = JSON.parse(packetString);
-	console.log('H-' + id + ':Total order received: ' + packetString);
-	var order = packet.seq;
-	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
-
-	packets[packet.seq] = packetString;
-
-	if (packet.source == 'handler' + id) {
-		if (packet.seq == lastServedReq + 1) {
-			socketLadoWorkers.send(JSON.stringify(packet));
-			lastServedReq += 1;
-		}
-		else {
-			while(packet.seq > lastServedReq + 1) {
-				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packetToSend.id]);
-				var packetToSend = packets[lastServedReq + 1];
-				socketLadoWorkers.send(JSON.stringify(packetToSend));
-				lastServedReq += 1;
-			}
-		}
-	}
-});
-
-
 totalorderSubscriber.connect(CONFIG.IP_TOTALORDERPUBLISHER);
 totalorderSubscriber.subscribe('TO');
 totalorderSubscriber.on('message', function(packetRaw) {
@@ -112,6 +87,7 @@ totalorderSubscriber.on('message', function(packetRaw) {
 	packets[packet.seq] = packetString;
 
 	if (packet.source == 'handler' + id) {
+		// Si lo solicite yo, lo manejamos
 		if (packet.seq == lastServedReq + 1) {
 			socketLadoWorkers.send(JSON.stringify(packet));
 			lastServedReq += 1;
