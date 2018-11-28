@@ -26,12 +26,13 @@ puller.connect(CONFIG.IP_LOGGER); //Router entre handlers y workers
 var state = {
 	clientRequests: {},
 	clientResponses: {},
-	responseTime: [],
 	workerJobs: {},
 	clientsAlive: 0,
 	workersAlive: 0,
 	handlersAlive: 0,
-	launchedClients: 0
+	launchedClients: 0,
+	router1Alive: 0,
+	router2Alive: 0
 }
 
 function checkAlive() {
@@ -47,6 +48,14 @@ function checkAlive() {
 		if (err) {return;}
 		state.workersAlive = parseInt(stdout);
 	});
+	exec('ps -o command= a | grep \'^node --expose-gc router.js\' | wc -l', (err, stdout, stderr) => {
+		if (err) {return;}
+		state.router1Alive = parseInt(stdout);
+	});
+	exec('ps -o command= a | grep \'^node --expose-gc router2.js\' | wc -l', (err, stdout, stderr) => {
+		if (err) {return;}
+		state.router2Alive = parseInt(stdout);
+	});
 }
 
 function printState() {
@@ -56,6 +65,8 @@ function printState() {
 	console.log('Clients = ', state.clientsAlive);
 	console.log('Workers = ', state.workersAlive);
 	console.log('Handlers = ', state.handlersAlive);
+	console.log('Router1 = ', state.router1Alive);
+	console.log('Router2 = ', state.router2Alive);
 	console.log('Client requests = ', state.clientRequests);
 	console.log('Client responses = ', state.clientResponses);
 	console.log('Workers completed jobs = ', state.workerJobs);
@@ -88,7 +99,8 @@ function(err) {
 
 			if (!state.closing) {
 				nreq = nreq + 1;
-				state.responseTime[nreq] = state.launchedClients.toString() + ', ' + arg2;
+				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.launchedClients.toString() + ', ' + arg2 + '\n',
+					function(err) { if(err) { return console.log(err); }});
 			}
 		}
 		if (type == 'worker_processed') {
@@ -113,15 +125,6 @@ process.stdin.on('keypress', (str, key) => {
 		(key.ctrl && key.name === 'c')) {
 
 		state.closing = true;
-
-		//log file
-		exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
-		exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-		for(var i=0; i<nreq; i++){
-			if (state.responseTime[i])
-				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.responseTime[i] + '\n',
-			function(err) { if(err) { return console.log(err); }});
-		}
 
 		exec('killall -9 node', (err, stdout, stderr) => {});
 		setTimeout(function() {
@@ -155,6 +158,9 @@ function launch() {
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
 	exec('rm -rf LOGS/execution; mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 
+	exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
+	exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
+	
 	launchFragment('router');
 	launchFragment('router2');
 	launchFragment('totalorder');
