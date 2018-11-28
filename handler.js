@@ -84,7 +84,7 @@ totalorderSubscriber.on('message', function(packetRaw) {
 	var order = packet.seq;
 	console.log('H-' + id + ':Total order for [' + packet.id + ']: ' + order);
 
-	packets[packet.seq] = packetString;
+	packets[packet.seq] = packet;
 
 	if (packet.source == 'handler' + id) {
 		// Si lo solicite yo, lo manejamos
