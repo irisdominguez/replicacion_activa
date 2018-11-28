@@ -53,9 +53,17 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 
 	while (expectedSeq in packetsToProcess) {
 		console.log('Working on package with seq ' + packet.seq);
-
-
-
+		
+		var packet = packetsToProcess[expectedSeq];
+		var newPacket = {
+			id: packet.id,
+			message: 'worked: ' + packet.message,
+			source: 'worker' + id,
+			target: packet.source,
+			producer: packet.producer,
+			type: 'worker_reply'
+		}
+		
 		//Write in file individual
 		try {
 			for(var i=0; i<JSON.parse(packet.message).nReps; i++){
@@ -67,20 +75,12 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 			/* Handle the error */
 			throw err;
 		}
-		
-		logger.send([fullid, 'worker_processed', '']);
-		var packet = packetsToProcess[expectedSeq];
-		var newPacket = {
-			id: packet.id,
-			message: 'worked: ' + packet.message,
-			source: 'worker' + id,
-			target: packet.source,
-			producer: packet.producer,
-			type: 'worker_reply'
-		}
 
+		logger.send([fullid, 'worker_processed', '']);
 		dealer.send(JSON.stringify(newPacket));
 
+		delete packetsToProcess[expectedSeq];
+		
 		expectedSeq += 1;
 	}
 
