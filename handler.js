@@ -90,6 +90,7 @@ totalorderSubscriber.on('message', function(packetRaw) {
 		// Si lo solicite yo, lo manejamos
 		if (packet.seq == lastServedReq + 1) {
 			socketLadoWorkers.send(JSON.stringify(packet));
+			delete packets[lastServedReq + 1]; // Delete packet after sending
 			lastServedReq += 1;
 		}
 		else {
@@ -97,6 +98,7 @@ totalorderSubscriber.on('message', function(packetRaw) {
 				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packet.id]);
 				var packetToSend = packets[lastServedReq + 1];
 				socketLadoWorkers.send(JSON.stringify(packetToSend));
+				delete packets[lastServedReq + 1]; // Delete packet after sending
 				lastServedReq += 1;
 			}
 		}
