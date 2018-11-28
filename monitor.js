@@ -126,7 +126,7 @@ process.stdin.on('keypress', (str, key) => {
 
 		state.closing = true;
 
-		exec('killall -9 node', (err, stdout, stderr) => {});
+		exec('killall -SIGTERM node', (err, stdout, stderr) => {});
 		setTimeout(function() {
 			process.exit();
 		}, 100);
