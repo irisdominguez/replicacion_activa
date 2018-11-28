@@ -133,12 +133,12 @@ process.stdin.on('keypress', (str, key) => {
 });
 
 function launchFragment(name) {
-	exec('node --expose-gc ' + name + '.js 2>&1 > LOGS/execution/' + name + '.log',
+	exec('node --expose-gc ' + name + '.js &> LOGS/execution/' + name + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
 function launchFragmentWithIndex(name, i) {
-	exec('node --expose-gc ' + name + '.js ' + i + ' 2>&1 > LOGS/execution/' + name + i + '.log',
+	exec('node --expose-gc ' + name + '.js ' + i + ' &> LOGS/execution/' + name + i + '.log',
 		(err, stdout, stderr) => {if (err) {return;}});
 };
 
