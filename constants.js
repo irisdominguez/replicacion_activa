@@ -1,5 +1,4 @@
 module.exports = {
-	NUM_CLIENTES: 3,
 	NUM_HANDLERS: 3,
 	NUM_REPLICAS: 3,
 	IP_ROUTER1_CLIENT: 'tcp://127.0.0.1:49152',
