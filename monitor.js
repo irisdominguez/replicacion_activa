@@ -18,8 +18,6 @@ setInterval(function() {
 
 
 var puller = zmq.socket('pull');
-var nreq = 0;
-
 
 puller.connect(CONFIG.IP_LOGGER); //Router entre handlers y workers
 
@@ -82,40 +80,24 @@ function(err) {
 		//~ console.log('[' + sender + '] -> ' + packetRaw.toString());
 		var type = typeRaw.toString();
 		if (type == 'client_request') {
-			if (sender in state.clientRequests) {
-				state.clientRequests[sender] += 1;
-			}
-			else {
-				state.clientRequests[sender] = 1;
-			}
+			state.clientRequests[sender] = (state.clientRequests[sender] || 0) + 1;
 		}
 		if (type == 'client_response') {
-			if (sender in state.clientResponses) {
-				state.clientResponses[sender] += 1;
-			}
-			else {
-				state.clientResponses[sender] = 1;
-			}
+			state.clientResponses[sender] = (state.clientResponses[sender] || 0) + 1;
 
 			if (!state.closing) {
-				nreq = nreq + 1;
 				fs.appendFileSync(__dirname + '/LOGS/measures/responseTime.csv', state.launchedClients.toString() + ', ' + arg2 + '\n',
 					function(err) { if(err) { return console.log(err); }});
 			}
 		}
 		if (type == 'worker_processed') {
-			if (sender in state.workerJobs) {
-				state.workerJobs[sender] += 1;
-			}
-			else {
-				state.workerJobs[sender] = 1;
-			}
+			state.workerJobs[sender] = (state.workerJobs[sender] || 0) + 1;
 		}
 	});
 	setInterval(function () {
 		checkAlive();
 		printState();
-	}, 100);
+	}, 500);
 });
 
 readline.emitKeypressEvents(process.stdin);
