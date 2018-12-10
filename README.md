@@ -21,3 +21,11 @@ Run Worker
 	node fo.js IDWORKER
 	node worker.js IDWORKER
 	IDWORKER >= 1
+
+
+# Ejecutar graficas
+sudo apt install python3-pip
+pip3 install matplotlib
+pip3 install pandas
+pip3 install numpy
+python3 plot.py

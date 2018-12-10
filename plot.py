@@ -32,7 +32,12 @@ for fila in tabla[:]:
 
 lista = []
 for key in dicc.keys():
-    lista.append([key, dicc[key]['suma'] / dicc[key]['nVeces'] ])
+    try:
+    	int(key)	
+    except:
+    	pass
+    else:
+    	lista.append([key, dicc[key]['suma'] / dicc[key]['nVeces'] ])
     print(f'nClients={key}, suma={dicc[key]["suma"]}, nVeces={dicc[key]["nVeces"]}')
 
 print(lista)

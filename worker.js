@@ -80,7 +80,7 @@ routerSubscriber.on('message', function(packetRaw) {	//sender,
 		try {
 			for(var i=0; i<JSON.parse(packet.message).nReps; i++){
 				fs.appendFileSync(
-					__dirname + '/LOGS/log' + id + '.txt', 
+					__dirname + '/LOGS/log' + fullid + '.txt', 
 					JSON.parse(packet.message).mensaje + '\n');
 			}
 		} catch (err) {
