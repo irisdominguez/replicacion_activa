@@ -148,6 +148,7 @@ function launch() {
 	launchFragment('totalorder');
 
 	for (var i = 1; i <= CONFIG.NUM_REPLICAS; i++) {
+		exec('rm -rf LOGS/logworker' + i + '.txt', (err, stdout, stderr) => {if (err) {return;}});
 		launchFragmentWithIndex('worker', i);
 	}
 
