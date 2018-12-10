@@ -23,9 +23,6 @@ var fullid = 'handler' + id;
 
 console.log(fullid + ' launched');
 
-var logger = zmq.socket('push');
-logger.connect(CONFIG.IP_LOGGER);
-
 // Sockets
 var routerLadoClients = zmq.socket('dealer');
 var socketLadoWorkers = zmq.socket('dealer');
@@ -56,7 +53,6 @@ routerLadoClients.on('message', function(sender, packetRaw) {
 		producer: packet.source,
 		type: 'handler_request'
 	}
-	logger.send([fullid, 'Receive request: ' + packet.id]);
 	packets_toBeHandled[newPacket.id]=true;
 	socketTotalOrder.send(JSON.stringify(newPacket));
 });
@@ -70,7 +66,6 @@ socketLadoWorkers.on('message', function(sender, packetRaw) {
 		delete packets_toBeHandled[packet.id];
 		var newPacket = packet;
 		newPacket.target = packet.producer;
-		logger.send([fullid, 'Send response to client: ' + packet.id]);
 		routerLadoClients.send(JSON.stringify(newPacket));
 	}
 });
@@ -95,7 +90,6 @@ totalorderSubscriber.on('message', function(packetRaw) {
 		}
 		else {
 			while(packet.seq > lastServedReq + 1) {
-				logger.send([fullid, 'Send to workers: [' + packet.seq + ']' + packet.id]);
 				var packetToSend = packets[lastServedReq + 1];
 				socketLadoWorkers.send(JSON.stringify(packetToSend));
 				delete packets[lastServedReq + 1]; // Delete packet after sending
