@@ -37,7 +37,7 @@ var currentHandler = 1;
 var timeoutTimer = null;
 var currentMessage = '';
 
-currentHandler = Math.random() * CONFIG.NUM_HANDLERS + 1;
+currentHandler = Math.floor(Math.random() * CONFIG.NUM_HANDLERS) + 1;
 
 //Conexión con el cliente
 replier.bind(CONFIG.IP_CLIENTS + (CONFIG.PORT_CLIENTS + parseInt(id)), function(err){
