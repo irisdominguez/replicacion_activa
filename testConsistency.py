@@ -41,10 +41,9 @@ for i in range(1, 10000):
 nFicheros = len(listaTextoFicheros)
 print(f'Nº de ficheros de log: {nFicheros}')
 
-for a in listaTextoFicheros:
-    print(len(a))
-
-print()
+# for a in listaTextoFicheros:
+#     print(len(a))
+# print()
 
 ordenados = sorted(listaTextoFicheros, key=len, reverse=True)
 for a in ordenados:
@@ -54,12 +53,21 @@ lineas = []
 for i in range(nFicheros):
     lineas.append(ordenados[i].split())
 
+longitudes = []
+for fichero in lineas:
+    longitudes.append(len(fichero))
+longMax = max(longitudes)
+
+
 col_width = max(len(word) for row in lineas for word in row) + 2  # padding
 
-for i in range(len(lineas[-1])):
+for i in range(longMax):
     print(f'{i}: ', end='')
     for j in range(nFicheros):
-        if j==0:
+        if i >= len(lineas[j]):
+            continue
+            # print(f'{"".ljust(col_width)}\t', end='')
+        elif j==0:
             print(f'{lineas[j][i].ljust(col_width)}\t', end='')
         elif lineas[j][i] == lineas[0][i]:
             # print(f'{bg.green}{lineas[j][i]}\t{reset}', end='')
@@ -69,6 +77,9 @@ for i in range(len(lineas[-1])):
             print(f'{bg.red}{lineas[j][i].ljust(col_width)}{reset}\t', end='')
             raise AssertionError('Hay una inconsistencia en los ficheros')
     print()
+print(f'Longitudes fiecheros: ')
+for i, long in enumerate(longitudes):
+    print(f'\tLongitud fichero worker {i+1}: {long}')
 print(fg.green + 'Se cumple la consistencia' + reset)
 
 
