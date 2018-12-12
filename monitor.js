@@ -138,11 +138,11 @@ function launch() {
 	state.launched = true;
 
 	exec('mkdir LOGS', (err, stdout, stderr) => {if (err) {return;}});
-	exec('rm -rf LOGS/execution; mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
+	exec('rm LOGS/logworker*; rm -rf LOGS/execution; mkdir LOGS/execution', (err, stdout, stderr) => {if (err) {return;}});
 
 	exec('mkdir LOGS/measures', (err, stdout, stderr) => {if (err) {return;}});
 	exec('rm LOGS/measures/responseTime.csv; touch LOGS/measures/responseTime.csv', (err, stdout, stderr) => {if (err) {return;}});
-	
+
 	launchFragment('router');
 	launchFragment('router2');
 	launchFragment('totalorder');
